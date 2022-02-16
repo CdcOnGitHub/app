@@ -1,10 +1,14 @@
 #include "Manager.hpp"
-#include "Window.hpp"
+#include "windows/Window.hpp"
+#include "windows/MainWindow.hpp"
+#include <iostream>
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-    Manager::setup(hInstance);
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
-    Manager::get()->run(new Window("Hello World!", 600, 400));
-
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
+    Manager::setup(hInstance);    
+    Manager::get()->run(new MainWindow());
     return 0;
 }

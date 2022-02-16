@@ -1,29 +1,16 @@
 #include "Manager.hpp"
-#include "Window.hpp"
 
-static Manager* g_manager = new Manager;
+static Manager* g_manager = new Manager();
 
 Manager* Manager::setup(HINSTANCE inst) {
-    WNDCLASSEXW wcex;
-
-    wcex.cbSize         = sizeof(WNDCLASSEXW);
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
-    wcex.lpfnWndProc    = Window::WndProc;
-    wcex.cbClsExtra     = 0;
-    wcex.cbWndExtra     = 0;
-    wcex.hInstance      = Manager::get()->inst();
-    wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-    wcex.hCursor        = LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground  = reinterpret_cast<HBRUSH>(GetStockObject(BLACK_BRUSH));
-    wcex.lpszMenuName   = NULL;
-    wcex.lpszClassName  = g_windowClassName;
-    wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
-
-    if (!RegisterClassExW(&wcex)) {
-        return g_manager;
-    }
-
     g_manager->m_inst = inst;
+    if (AllocConsole()) {
+        FILE* dummyFile;
+        freopen_s(&dummyFile, "CONOUT$", "w", stdout);
+        freopen_s(&dummyFile, "CONIN$", "r", stdin);
+    } else {
+        MessageBoxA(nullptr, "Unable to attach console", "wtf", MB_ICONERROR);
+    }
     return g_manager;
 }
 
@@ -33,9 +20,32 @@ Manager* Manager::get() {
 
 void Manager::run(Window* window) {
     m_mainWindow = window;
-    Window::run();
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0, 0)) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 }
 
-HINSTANCE Manager::inst() const {
+Window* Manager::getMainWindow() const {
+    return m_mainWindow;
+}
+
+HINSTANCE Manager::getInst() const {
     return m_inst;
+}
+
+HFONT Manager::loadFont(std::string const& face, int size) {
+    if (m_fonts.count(face)) return m_fonts.at(face);
+    auto font = CreateFontA(
+        size, 0, 0, 0, FW_NORMAL, false, false, false, 
+        DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
+        CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+        DEFAULT_PITCH, face.c_str()
+    );
+    if (!font) {
+        throw std::runtime_error("Unable to create font");
+    }
+    this->m_fonts[face] = font;
+    return font;
 }
