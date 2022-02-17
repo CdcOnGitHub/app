@@ -1,4 +1,5 @@
 #include "Widget.hpp"
+#include <Window.hpp>
 
 static std::unordered_map<HWND, Widget*> g_hwnds;
 
@@ -9,8 +10,14 @@ void Widget::updateParent() {
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
-        SetParent(child->m_hwnd, this->m_hwnd);
+        if (this->m_window) {
+            SetParent(child->m_hwnd, this->m_window->m_hwnd);
+        } else {
+            SetParent(child->m_hwnd, this->m_hwnd);
+            child->m_window = dynamic_cast<Window*>(this);
+        }
         child->updateParent();
+        child->updatePosition();
         this->m_children.push_back(child);
     }
 }
@@ -27,12 +34,36 @@ void Widget::remove(Widget* child, bool release) {
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
 }
 
+POINT Widget::offset() const {
+    POINT p;
+    p.x = m_x;
+    p.y = m_y;
+    if (m_parent && !dynamic_cast<Window*>(m_parent)) {
+        auto add = m_parent->offset();
+        p.x += add.x;
+        p.y += add.y;
+    }
+    return p;
+}
+
+void Widget::updatePosition() {
+    this->move(m_x, m_y);
+}
+
 void Widget::move(int x, int y) {
-    SetWindowPos(m_hwnd, nullptr, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    m_x = x;
+    m_y = y;
+    auto [tx, ty] = this->offset();
+    SetWindowPos(m_hwnd, nullptr, tx, ty, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+    for (auto& child : m_children) {
+        child->updatePosition();
+    }
 }
 
 void Widget::resize(int w, int h) {
     m_autoresize = false;
+    m_width = w;
+    m_height = h;
     SetWindowPos(m_hwnd, nullptr, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
 }
 

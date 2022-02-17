@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include "../Manager.hpp"
 
+class Window;
+
 class Widget {
 protected:
     int m_x = 0;
@@ -14,10 +16,12 @@ protected:
     int m_height = 0;
     bool m_autoresize = false;
     Widget* m_parent = nullptr;
+    Window* m_window = nullptr;
     std::vector<Widget*> m_children;
     HWND m_hwnd = nullptr;
 
     virtual void updateParent();
+    void updatePosition();
 
     void init(HWND);
 
@@ -37,6 +41,8 @@ public:
     virtual void move(int x, int y);
     virtual void show();
     virtual void hide();
+
+    POINT offset() const;
 
     static Widget* fromHWND(HWND hwnd);
 };

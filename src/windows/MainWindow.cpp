@@ -1,6 +1,7 @@
 #include "MainWindow.hpp"
 #include <Label.hpp>
 #include <Button.hpp>
+#include <Rectangle.hpp>
 
 MainWindow::MainWindow() : Window("Geode App") {
     auto label = new Label("Hello World longer text and stuff yeahh");
@@ -8,12 +9,20 @@ MainWindow::MainWindow() : Window("Geode App") {
     label->setFont("Comic Sans MS");
     this->add(label);
 
+    auto rect = new RectWidget();
+    rect->move(90, 160);
+    rect->resize(50, 30);
+    rect->setColor(RGB(20, 120, 80));
+    this->add(rect);
+
     auto label2 = new Label("Awesome another label");
-    label2->move(40, 220);
+    label2->move(0, 0);
     label2->setColor(RGB(255, 50, 80));
     label2->setFontSize(35);
-    this->add(label2);
+    rect->add(label2);
 
+    rect->move(150, 160);
+    
     auto btn = new Button("Acquire Estrogen");
     btn->move(80, 100);
     btn->resize(250, 10);
