@@ -13,3 +13,6 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp)
 target_include_directories(${PROJECT_NAME} PUBLIC
     src/widgets
 )
+target_link_libraries(${PROJECT_NAME} PUBLIC
+    dwmapi
+)

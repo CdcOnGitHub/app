@@ -1,12 +1,17 @@
 #include "Widget.hpp"
 
+static std::unordered_map<HWND, Widget*> g_hwnds;
+
+void Widget::updateParent() {
+    SetWindowLongPtrA(m_hwnd, GWL_STYLE, WS_CHILD | WS_VISIBLE);
+}
+
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
         SetParent(child->m_hwnd, this->m_hwnd);
-        SetWindowLongPtrA(child->m_hwnd, GWL_STYLE, WS_CHILD | WS_VISIBLE);
+        child->updateParent();
         this->m_children.push_back(child);
-        UpdateWindow(child->m_hwnd);
     }
 }
 
@@ -27,7 +32,12 @@ void Widget::move(int x, int y) {
 }
 
 void Widget::resize(int w, int h) {
+    m_autoresize = false;
     SetWindowPos(m_hwnd, nullptr, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
+}
+
+void Widget::autoresize() {
+    m_autoresize = true;
 }
 
 void Widget::show() {
@@ -40,12 +50,7 @@ void Widget::hide() {
     UpdateWindow(m_hwnd);
 }
 
-void Widget::paint() {}
-
-LRESULT Widget::proc(UINT msg, WPARAM wp, LPARAM lp) {
-    if (msg == WM_PAINT) this->paint();
-    return DefWindowProc(m_hwnd, msg, wp, lp);
-}
+void Widget::paint(DRAWITEMSTRUCT*s) {}
 
 Widget* Widget::getParent() const {
     return m_parent;
@@ -66,6 +71,46 @@ Widget::~Widget() {
     for (auto& child : m_children) {
         delete child;
     }
+    g_hwnds.erase(m_hwnd);
     if (m_hwnd) DestroyWindow(m_hwnd);
 }
 
+void Widget::init(HWND hwnd) {
+    g_hwnds[hwnd] = this;
+}
+
+Widget* Widget::fromHWND(HWND hwnd) {
+    if (!g_hwnds.count(hwnd)) return nullptr;
+    return g_hwnds.at(hwnd);
+}
+
+void ColorWidget::setColor(COLORREF color) {
+    m_color = color;
+}
+
+COLORREF ColorWidget::getColor() const {
+    return m_color;
+}
+
+void TextWidget::setText(std::string const& text) {
+    this->m_text = text;
+    SetWindowTextA(m_hwnd, text.c_str());
+}
+
+std::string TextWidget::getText() const {
+    return m_text;
+}
+
+void TextWidget::setFont(std::string const& font, int size) {
+    m_font = font;
+    m_fontsize = size;
+    SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(Manager::get()->loadFont(font, size)), true);
+}
+
+void TextWidget::setFont(std::string const& font) {
+    this->setFont(font, m_fontsize);
+}
+
+void TextWidget::setFontSize(int size) {
+    this->setFont(m_font, size);
+}

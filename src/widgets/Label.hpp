@@ -3,15 +3,12 @@
 #include "Widget.hpp"
 #include <string>
 
-class Label : public Widget {
+class Label : public TextWidget {
 protected:
-    std::string m_text;
+    void updateParent() override;
 
 public:
     Label(std::string const& text);
 
-    LRESULT proc(UINT msg, WPARAM wp, LPARAM lp) override;
-
-    void setText(std::string const& text);
-    void setFont(std::string const& font);
+    void paint(DRAWITEMSTRUCT*) override;
 };

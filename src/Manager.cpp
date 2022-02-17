@@ -4,6 +4,7 @@ static Manager* g_manager = new Manager();
 
 Manager* Manager::setup(HINSTANCE inst) {
     g_manager->m_inst = inst;
+    #ifndef NDEBUG
     if (AllocConsole()) {
         FILE* dummyFile;
         freopen_s(&dummyFile, "CONOUT$", "w", stdout);
@@ -11,6 +12,7 @@ Manager* Manager::setup(HINSTANCE inst) {
     } else {
         MessageBoxA(nullptr, "Unable to attach console", "wtf", MB_ICONERROR);
     }
+    #endif
     return g_manager;
 }
 
@@ -35,8 +37,13 @@ HINSTANCE Manager::getInst() const {
     return m_inst;
 }
 
+std::string Manager::fontFaceID(std::string const& font, int size) {
+    return font + std::to_string(size);
+}
+
 HFONT Manager::loadFont(std::string const& face, int size) {
-    if (m_fonts.count(face)) return m_fonts.at(face);
+    auto faceid = fontFaceID(face, size);
+    if (m_fonts.count(faceid)) return m_fonts.at(faceid);
     auto font = CreateFontA(
         size, 0, 0, 0, FW_NORMAL, false, false, false, 
         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
@@ -46,6 +53,17 @@ HFONT Manager::loadFont(std::string const& face, int size) {
     if (!font) {
         throw std::runtime_error("Unable to create font");
     }
-    this->m_fonts[face] = font;
+    this->m_fonts[faceid] = font;
     return font;
+}
+
+HMENU Manager::acquireMenuID() {
+    HMENU id = reinterpret_cast<HMENU>(0x100);
+    while (m_menuIDs.count(id)) id++;
+    m_menuIDs.insert(id);
+    return id;
+}
+
+void Manager::relinquishMenuID(HMENU id) {
+    m_menuIDs.erase(id);
 }
