@@ -16,7 +16,6 @@ Button::Button(std::string const& text) {
         throw std::runtime_error("Unable to create Button");
     }
     g_hmenus[m_id] = this;
-    std::cout << "created button with id " << m_id << "\n";
     this->init(m_hwnd);
     this->setText(text);
     this->setFont("Segoe UI");

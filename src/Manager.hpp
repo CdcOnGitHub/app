@@ -32,4 +32,6 @@ public:
 
     Window* getMainWindow() const;
     HINSTANCE getInst() const;
+    int getDPI(HWND = nullptr);
+    float getDPIScale(HWND = nullptr);
 };

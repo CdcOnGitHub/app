@@ -1,4 +1,6 @@
 #include "Manager.hpp"
+#include "windows/Window.hpp"
+#include <ShellScalingApi.h>
 
 static Manager* g_manager = new Manager();
 
@@ -45,7 +47,8 @@ HFONT Manager::loadFont(std::string const& face, int size) {
     auto faceid = fontFaceID(face, size);
     if (m_fonts.count(faceid)) return m_fonts.at(faceid);
     auto font = CreateFontA(
-        size, 0, 0, 0, FW_NORMAL, false, false, false, 
+        MulDiv(size, Manager::get()->getDPI(), 96),
+        0, 0, 0, FW_NORMAL, false, false, false, 
         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
         CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
         DEFAULT_PITCH, face.c_str()
@@ -66,4 +69,18 @@ HMENU Manager::acquireMenuID() {
 
 void Manager::relinquishMenuID(HMENU id) {
     m_menuIDs.erase(id);
+}
+
+int Manager::getDPI(HWND hwnd) {
+    if (hwnd) return GetDpiForWindow(hwnd);
+    return (m_mainWindow ?
+        GetDpiForWindow(m_mainWindow->getHWND()) :
+        GetDpiForSystem());
+}
+
+float Manager::getDPIScale(HWND hwnd) {
+    if (hwnd) return GetDpiForWindow(hwnd) / 96.f;
+    return (m_mainWindow ?
+        GetDpiForWindow(m_mainWindow->getHWND()) :
+        GetDpiForSystem()) / 96.f;
 }

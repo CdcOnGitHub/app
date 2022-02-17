@@ -4,7 +4,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED On)
 
 project(GeodeAppWin VERSION 0.1.0)
 
-file(GLOB_RECURSE SOURCES src/*.cpp)
+file(GLOB_RECURSE SOURCES src/*.cpp GeodeApp.exe.manifest)
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 
@@ -14,5 +14,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     src/widgets
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    dwmapi
+    dwmapi shcore
 )
