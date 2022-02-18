@@ -41,11 +41,16 @@ bool Button::wantsMouse() const {
     return true;
 }
 
+HCURSOR Button::cursor() const {
+    static auto hand = LoadCursor(nullptr, IDC_HAND);
+    return hand;
+}
+
 void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (!m_bgBrush) m_bgBrush = CreateSolidBrush(m_bgColor);
     if (!m_hoverBrush) m_hoverBrush = CreateSolidBrush(color_utils::lighten(m_bgColor, 50));
     if (!m_clickBrush) m_clickBrush = CreateSolidBrush(color_utils::darken(m_bgColor, 50));
-    if (!m_pen) m_pen = CreatePen(PS_SOLID, 1, color_utils::lighten(m_bgColor, 50));
+    if (!m_pen) m_pen = CreatePen(PS_SOLID, 1, m_bgColor);
     auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
 
     if (m_autoresize) {

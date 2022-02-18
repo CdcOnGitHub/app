@@ -28,6 +28,7 @@ public:
 
     void enter() override;
     void leave() override;
+    HCURSOR cursor() const;
 
     void setBG(COLORREF);
     COLORREF getBG() const;

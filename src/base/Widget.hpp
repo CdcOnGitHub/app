@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "../Manager.hpp"
-#include <output.hpp>
+#include <utils.hpp>
 
 class Window;
 
@@ -19,14 +19,18 @@ protected:
     bool m_visible = false;
     bool m_hovered = false;
     bool m_mousedown = false;
+    bool m_tabbed = false;
     Widget* m_parent = nullptr;
     Window* m_window = nullptr;
     std::vector<Widget*> m_children;
+    static HBRUSH s_tabBrush;
+    static Widget* s_hoveredWidget;
 
     void updatePosition();
     void setWindow(Window*);
-    void propagateMouseMoveEvent(POINT& p, bool down);
+    Widget* propagateMouseMoveEvent(POINT& p, bool down);
     void propagateMouseEvent(POINT& p, bool down);
+    bool propagateTabEvent(int& index, int target);
     bool propagateCaptureMouse(POINT& p);
 
     friend class Window;
@@ -49,11 +53,15 @@ public:
     virtual void update();
     virtual void enter();
     virtual void leave();
+    void tabenter();
+    void tableave();
     virtual void click();
     virtual void mousedown(int x, int y);
     virtual void mouseup(int x, int y);
     virtual void mousemove(int x, int y);
     virtual bool wantsMouse() const;
+
+    virtual HCURSOR cursor() const;
 
     POINT offset() const;
     RECT rect() const;

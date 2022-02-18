@@ -12,6 +12,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp)
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     src
+    src/base
     src/widgets
     src/windows
     src/utils

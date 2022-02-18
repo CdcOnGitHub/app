@@ -155,7 +155,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.y = GET_Y_LPARAM(lp);
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
             if (this->propagateCaptureMouse(p)) return hit;
-            this->propagateMouseMoveEvent(p, m_mousedown);
+            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
             
             if (hit == HTCLIENT) hit = HTCAPTION;
             
@@ -191,7 +191,35 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.x = GET_X_LPARAM(lp);
             p.y = GET_Y_LPARAM(lp);
             m_mousedown = wp & MK_LBUTTON;
-            this->propagateMouseMoveEvent(p, wp & MK_LBUTTON);
+            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, wp & MK_LBUTTON);
+        } break;
+
+        case WM_SETCURSOR: {
+            if (Widget::s_hoveredWidget) {
+                auto cursor = Widget::s_hoveredWidget->cursor();
+                if (cursor) {
+                    SetCursor(cursor);
+                    return 0;
+                }
+            }
+        } break;
+
+        case WM_KEYDOWN: {
+            if (wp == VK_TAB) {
+                // todo: fix this mess
+                int index = 0;
+                if (!this->propagateTabEvent(index, m_tabIndex)) {
+                    m_tabIndex = 0;
+                }
+                if (GetKeyState(VK_SHIFT) & 0x8000) {
+                    if (m_tabIndex > 0) {
+                        m_tabIndex--;
+                    }
+                } else {
+                    m_tabIndex++;
+                }
+                return 0;
+            }
         } break;
 
         case WM_SIZE: {

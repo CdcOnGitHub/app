@@ -3,13 +3,14 @@
 #include <Windows.h>
 #include <string>
 #include <unordered_map>
-#include "../widgets/Widget.hpp"
+#include <Widget.hpp>
 
 class Window : public Widget {
 protected:
     HWND m_hwnd = nullptr;
     std::string m_title;
     bool m_fullscreen = false;
+    int m_tabIndex = 0;
 
 public:
     Window(std::string const& title, int width = 600, int height = 400);

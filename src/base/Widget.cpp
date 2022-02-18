@@ -1,6 +1,9 @@
 #include "Widget.hpp"
 #include <Window.hpp>
 
+HBRUSH Widget::s_tabBrush = nullptr;
+Widget* Widget::s_hoveredWidget = nullptr;
+
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
@@ -90,6 +93,16 @@ void Widget::mouseup(int x, int y) {
     this->click();
 }
 
+void Widget::tabenter() {
+    this->m_tabbed = true;
+    this->update();
+}
+
+void Widget::tableave() {
+    this->m_tabbed = false;
+    this->update();
+}
+
 bool Widget::wantsMouse() const {
     return false;
 }
@@ -104,43 +117,73 @@ bool Widget::propagateCaptureMouse(POINT& p) {
     return false;
 }
 
-void Widget::propagateMouseEvent(POINT& p, bool down) {
+bool Widget::propagateTabEvent(int& index, int target) {
     for (auto& child : m_children) {
-        auto r = child->rect();
-        if (PtInRect(&r, p)) {
-            if (down) {
-                child->m_mousedown = true;
-                child->mousedown(p.x, p.y);
-                child->update();
-            } else {
-                child->m_mousedown = false;
-                child->mouseup(p.x, p.y);
-                child->update();
+        if (child->m_visible && child->wantsMouse()) {
+            if (index == target) {
+                child->tabenter();
+                return true;
+            }
+            child->tableave();
+            index++;
+        }
+        if (child->propagateTabEvent(index, target))
+            return true;
+    }
+    return false;
+}
+
+void Widget::propagateMouseEvent(POINT& p, bool down) {
+    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
+        auto child = *it;
+        if (child->wantsMouse()) {
+            auto r = child->rect();
+            if (PtInRect(&r, p)) {
+                if (down) {
+                    child->m_mousedown = true;
+                    child->mousedown(p.x, p.y);
+                    child->update();
+                } else {
+                    child->m_mousedown = false;
+                    child->mouseup(p.x, p.y);
+                    child->update();
+                }
             }
         }
-        child->propagateMouseEvent(p, down);
+    }
+    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
+        (*it)->propagateMouseEvent(p, down);
     }
 }
 
-void Widget::propagateMouseMoveEvent(POINT& p, bool down) {
-    for (auto& child : m_children) {
-        auto r = child->rect();
-        if (PtInRect(&r, p)) {
-            if (!child->m_hovered) {
-                child->m_hovered = true;
-                child->m_mousedown = down;
-                child->enter();
-            }
-            child->mousemove(p.x, p.y);
-        } else {
-            if (child->m_hovered) {
-                child->m_hovered = false;
-                child->m_mousedown = false;
-                child->leave();
+Widget* Widget::propagateMouseMoveEvent(POINT& p, bool down) {
+    Widget* ret = nullptr;
+    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
+        auto child = *it;
+        if (child->wantsMouse()) {
+            auto r = child->rect();
+            if (PtInRect(&r, p)) {
+                if (!child->m_hovered) {
+                    child->m_hovered = true;
+                    child->m_mousedown = down;
+                    child->enter();
+                }
+                ret = child;
+                child->mousemove(p.x, p.y);
+            } else {
+                if (child->m_hovered) {
+                    child->m_hovered = false;
+                    child->m_mousedown = false;
+                    child->leave();
+                }
             }
         }
-        child->propagateMouseMoveEvent(p, down);
     }
+    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
+        auto r = (*it)->propagateMouseMoveEvent(p, down);
+        if (r) ret = r;
+    }
+    return ret;
 }
 
 void Widget::update() {
@@ -148,9 +191,18 @@ void Widget::update() {
 }
 
 void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
+    if (m_tabbed) {
+        if (!s_tabBrush) s_tabBrush = CreateSolidBrush(RGB(255, 255, 180));
+        auto r = this->rect();
+        FrameRect(hdc, &r, s_tabBrush);
+    }
     for (auto& child : m_children) {
         if (child->m_visible) child->paint(hdc, ps);
     }
+}
+
+HCURSOR Widget::cursor() const {
+    return nullptr;
 }
 
 Widget* Widget::getParent() const {
