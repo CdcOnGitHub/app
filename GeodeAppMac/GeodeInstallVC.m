@@ -40,7 +40,7 @@
         } else if (gd.count > 1) {
             [self updateInstruction: @"Close one or more GD instances"];
         } else {
-            NSString* path = gd[0].bundleURL.absoluteString;
+            NSString* path = gd[0].bundleURL.path;
             //NSLog(@"the %@", path);
             bool b = false;
             

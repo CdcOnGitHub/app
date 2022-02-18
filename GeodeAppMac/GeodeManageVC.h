@@ -10,8 +10,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface GeodeManageVC : GeodeBaseVC
+@interface GeodeManageVC : GeodeBaseVC <NSTableViewDataSource, NSTableViewDelegate>
+@property (weak) IBOutlet NSTableView *logTable;
+@property (weak) IBOutlet NSOutlineView *modTable;
+@property (nonatomic, retain) NSString* geodePath;
 
+- (void)openLog:(id)nid;
 @end
 
 NS_ASSUME_NONNULL_END

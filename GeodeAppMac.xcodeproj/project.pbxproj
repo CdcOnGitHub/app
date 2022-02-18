@@ -13,6 +13,7 @@
 		AF82A7F727BA3B78004DA68E /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = AF82A7F527BA3B78004DA68E /* Model.xcdatamodeld */; };
 		AF82A80627BBF336004DA68E /* ContextStub.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80527BBF336004DA68E /* ContextStub.m */; };
 		AF82A80B27BD2998004DA68E /* GeodeManageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80A27BD2998004DA68E /* GeodeManageVC.m */; };
+		AF82A80E27BFC8E5004DA68E /* GeodeVersionVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */; };
 		AFB354A327AC89D8006A4958 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB354A227AC89D8006A4958 /* AppDelegate.m */; };
 		AFB354A627AC89D8006A4958 /* GeodeInstallVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB354A527AC89D8006A4958 /* GeodeInstallVC.m */; };
 		AFB354A827AC89D9006A4958 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFB354A727AC89D9006A4958 /* Assets.xcassets */; };
@@ -47,6 +48,8 @@
 		AF82A80527BBF336004DA68E /* ContextStub.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ContextStub.m; sourceTree = "<group>"; };
 		AF82A80927BD2998004DA68E /* GeodeManageVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeodeManageVC.h; sourceTree = "<group>"; };
 		AF82A80A27BD2998004DA68E /* GeodeManageVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeodeManageVC.m; sourceTree = "<group>"; };
+		AF82A80C27BFC8E5004DA68E /* GeodeVersionVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeodeVersionVC.h; sourceTree = "<group>"; };
+		AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeodeVersionVC.m; sourceTree = "<group>"; };
 		AFB3549E27AC89D8006A4958 /* GeodeAppMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeodeAppMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFB354A127AC89D8006A4958 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AFB354A227AC89D8006A4958 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -113,6 +116,8 @@
 				AF82A80527BBF336004DA68E /* ContextStub.m */,
 				AF82A80927BD2998004DA68E /* GeodeManageVC.h */,
 				AF82A80A27BD2998004DA68E /* GeodeManageVC.m */,
+				AF82A80C27BFC8E5004DA68E /* GeodeVersionVC.h */,
+				AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */,
 			);
 			path = GeodeAppMac;
 			sourceTree = "<group>";
@@ -203,6 +208,7 @@
 				AF82A7F727BA3B78004DA68E /* Model.xcdatamodeld in Sources */,
 				AF82A7F327BA3596004DA68E /* GeodeMainVC.m in Sources */,
 				AFB354AE27AC89D9006A4958 /* main.m in Sources */,
+				AF82A80E27BFC8E5004DA68E /* GeodeVersionVC.m in Sources */,
 				AF82A80B27BD2998004DA68E /* GeodeManageVC.m in Sources */,
 				AF82A80627BBF336004DA68E /* ContextStub.m in Sources */,
 				AF82A7ED27BA149B004DA68E /* GeodeBaseVC.m in Sources */,

@@ -8,6 +8,7 @@
 
 #import "GeodeMainVC.h"
 #import "AppDelegate.h"
+#import "GeodeManageVC.h"
 
 @interface GeodeMainVC ()
 
@@ -36,11 +37,7 @@
     return NSAppDel.contextList.count;
 }
 
-- (NSView *)tableView:(NSTableView *)tableView
-
-   viewForTableColumn:(NSTableColumn *)tableColumn
-
-                  row:(NSInteger)row {
+- (NSView *)tableView:(NSTableView *)tableView viewForTableColumn:(NSTableColumn *)tableColumn row:(NSInteger)row {
 
  
 
@@ -76,6 +73,13 @@
         //self.manageContextButton.borderNormalColor = [NSColor colorWithRed:193.0/255.0 green:183.0/255.0 blue:120.0/255.0 alpha:1];
         //self.manageContextButton.isEnabled = YES;
     }
+}
+- (IBAction)openContext:(id)sender {
+    GeodeManageVC* v = (GeodeManageVC*)[[NSStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]] instantiateControllerWithIdentifier:@"manageVc"];
+    
+    [v setGeodePath: [[NSAppDel.contextList objectAtIndex: self.ContextTable.selectedRow] installPath]];
+    
+    [self presentViewControllerAsSheet:v];
 }
 
 @end
