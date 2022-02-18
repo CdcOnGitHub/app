@@ -7,6 +7,7 @@
 
 class Window : public Widget {
 protected:
+    int m_classID;
     HWND m_hwnd = nullptr;
     std::string m_title;
     bool m_fullscreen = false;

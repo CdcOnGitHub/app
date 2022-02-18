@@ -41,6 +41,9 @@ struct WINCOMPATTRDATA {
 Window::Window(std::string const& title, int width, int height) {
     WNDCLASSEXA wcex;
 
+    m_classID = Manager::get()->acquireWindowClassID();
+    auto className = "GeodeAppWindow" + std::to_string(m_classID);
+
     wcex.cbSize         = sizeof(WNDCLASSEXA);
     wcex.style          = CS_HREDRAW | CS_VREDRAW;
     wcex.lpfnWndProc    = Window::WndProc;
@@ -51,23 +54,22 @@ Window::Window(std::string const& title, int width, int height) {
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = CreateSolidBrush(RGB(0x26, 0x24, 0x2d));
     wcex.lpszMenuName   = nullptr;
-    wcex.lpszClassName  = g_windowClassName;
+    wcex.lpszClassName  = className.c_str();
     wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
 
     if (!RegisterClassExA(&wcex)) {
         throw std::runtime_error("Unable to register Window Class");
     }
 
-    auto parent = Manager::get()->getMainWindow();
     HWND hwnd = CreateWindowExA(
         WS_EX_OVERLAPPEDWINDOW,
-        g_windowClassName,
+        className.c_str(),
         title.c_str(),
         WS_OVERLAPPEDWINDOW | WS_EX_LAYERED,
         CW_USEDEFAULT, CW_USEDEFAULT,
         MulDiv(width, Manager::get()->getDPI(), 96),
         MulDiv(height, Manager::get()->getDPI(), 96),
-        parent ? parent->getHWND() : nullptr,
+        nullptr,
         nullptr,
         Manager::get()->getInst(),
         nullptr
@@ -98,6 +100,13 @@ Window::Window(std::string const& title, int width, int height) {
     this->center();
 }
 
+Window::~Window() {
+    g_windows.erase(m_hwnd);
+    auto className = "GeodeAppWindow" + std::to_string(m_classID);
+    UnregisterClassA(className.c_str(), Manager::get()->getInst());
+    Manager::get()->relinquishWindowClassID(m_classID);
+}
+
 void Window::show() {
     Widget::show();
     ShowWindow(m_hwnd, SW_SHOW);
@@ -119,10 +128,6 @@ HWND Window::getHWND() const {
 
 void Window::updateWindow(RECT rc) {
     InvalidateRect(m_hwnd, &rc, true);
-}
-
-Window::~Window() {
-    g_windows.erase(m_hwnd);
 }
 
 void Window::add(Widget* child) {

@@ -71,6 +71,17 @@ void Manager::relinquishMenuID(HMENU id) {
     m_menuIDs.erase(id);
 }
 
+int Manager::acquireWindowClassID() {
+    auto id = 0;
+    while (m_classIDs.count(id)) id++;
+    m_classIDs.insert(id);
+    return id;
+}
+
+void Manager::relinquishWindowClassID(int id) {
+    m_classIDs.erase(id);
+}
+
 int Manager::getDPI(HWND hwnd) {
     if (hwnd) return GetDpiForWindow(hwnd);
     return (m_mainWindow ?

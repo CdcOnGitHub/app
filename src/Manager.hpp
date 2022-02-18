@@ -8,14 +8,13 @@
 
 class Window;
 
-constexpr static auto g_windowClassName = "GeodeApp";
-
 class Manager {
 protected:
     HINSTANCE m_inst;
     Window* m_mainWindow = nullptr;
     std::unordered_map<std::string, HFONT> m_fonts;
     std::unordered_set<HMENU> m_menuIDs;
+    std::unordered_set<int> m_classIDs;
     
     std::string fontFaceID(std::string const& font, int size);
 
@@ -29,6 +28,9 @@ public:
 
     HMENU acquireMenuID();
     void relinquishMenuID(HMENU);
+
+    int acquireWindowClassID();
+    void relinquishWindowClassID(int id);
 
     Window* getMainWindow() const;
     HINSTANCE getInst() const;
