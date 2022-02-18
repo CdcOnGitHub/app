@@ -4,11 +4,8 @@
 #include <string>
 
 class Label : public TextWidget {
-protected:
-    void updateParent() override;
-
 public:
     Label(std::string const& text);
 
-    void paint(DRAWITEMSTRUCT*) override;
+    void paint(HDC hdc, PAINTSTRUCT* ps) override;
 };

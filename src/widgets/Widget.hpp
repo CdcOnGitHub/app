@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "../Manager.hpp"
+#include <output.hpp>
 
 class Window;
 
@@ -15,24 +16,28 @@ protected:
     int m_width = 0;
     int m_height = 0;
     bool m_autoresize = false;
+    bool m_visible = false;
+    bool m_hovered = false;
+    bool m_mousedown = false;
     Widget* m_parent = nullptr;
     Window* m_window = nullptr;
     std::vector<Widget*> m_children;
-    HWND m_hwnd = nullptr;
 
-    virtual void updateParent();
     void updatePosition();
+    void setWindow(Window*);
+    void propagateMouseMoveEvent(POINT& p, bool down);
+    void propagateMouseEvent(POINT& p, bool down);
+    bool propagateCaptureMouse(POINT& p);
 
-    void init(HWND);
+    friend class Window;
 
 public:
     virtual ~Widget();
 
-    virtual void paint(DRAWITEMSTRUCT*);
+    virtual void paint(HDC hdc, PAINTSTRUCT* ps);
 
     Widget* getParent() const;
     std::vector<Widget*> getChildren() const;
-    HWND getHWND() const;
 
     virtual void add(Widget* child);
     virtual void remove(Widget* child, bool release = true);
@@ -41,10 +46,17 @@ public:
     virtual void move(int x, int y);
     virtual void show();
     virtual void hide();
+    virtual void update();
+    virtual void enter();
+    virtual void leave();
+    virtual void click();
+    virtual void mousedown(int x, int y);
+    virtual void mouseup(int x, int y);
+    virtual void mousemove(int x, int y);
+    virtual bool wantsMouse() const;
 
     POINT offset() const;
-
-    static Widget* fromHWND(HWND hwnd);
+    RECT rect() const;
 };
 
 class ColorWidget : public Widget {

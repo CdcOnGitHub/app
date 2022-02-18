@@ -1,22 +1,10 @@
 #include "Widget.hpp"
 #include <Window.hpp>
 
-static std::unordered_map<HWND, Widget*> g_hwnds;
-
-void Widget::updateParent() {
-    SetWindowLongPtrA(m_hwnd, GWL_STYLE, WS_CHILD | WS_VISIBLE);
-}
-
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
-        if (this->m_window) {
-            SetParent(child->m_hwnd, this->m_window->m_hwnd);
-        } else {
-            SetParent(child->m_hwnd, this->m_hwnd);
-            child->m_window = dynamic_cast<Window*>(this);
-        }
-        child->updateParent();
+        child->m_window = m_window;
         child->updatePosition();
         this->m_children.push_back(child);
     }
@@ -34,6 +22,13 @@ void Widget::remove(Widget* child, bool release) {
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
 }
 
+void Widget::setWindow(Window* window) {
+    m_window = window;
+    for (auto& child : m_children) {
+        child->setWindow(window);
+    }
+}
+
 POINT Widget::offset() const {
     POINT p;
     p.x = m_x;
@@ -46,6 +41,16 @@ POINT Widget::offset() const {
     return p;
 }
 
+RECT Widget::rect() const {
+    auto p = this->offset();
+    RECT r;
+    r.left = p.x;
+    r.top = p.y;
+    r.right = p.x + m_width;
+    r.bottom = p.y + m_height;
+    return r;
+}
+
 void Widget::updatePosition() {
     this->move(m_x, m_y);
 }
@@ -53,8 +58,6 @@ void Widget::updatePosition() {
 void Widget::move(int x, int y) {
     m_x = x;
     m_y = y;
-    auto [tx, ty] = this->offset();
-    SetWindowPos(m_hwnd, nullptr, tx, ty, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
     for (auto& child : m_children) {
         child->updatePosition();
     }
@@ -64,7 +67,6 @@ void Widget::resize(int w, int h) {
     m_autoresize = false;
     m_width = w;
     m_height = h;
-    SetWindowPos(m_hwnd, nullptr, 0, 0, w, h, SWP_NOZORDER | SWP_NOMOVE);
 }
 
 void Widget::autoresize() {
@@ -72,16 +74,84 @@ void Widget::autoresize() {
 }
 
 void Widget::show() {
-    ShowWindow(m_hwnd, SW_SHOWNORMAL);
-    UpdateWindow(m_hwnd);
+    m_visible = true;
 }
 
 void Widget::hide() {
-    ShowWindow(m_hwnd, SW_HIDE);
-    UpdateWindow(m_hwnd);
+    m_visible = false;
 }
 
-void Widget::paint(DRAWITEMSTRUCT*s) {}
+void Widget::enter() {}
+void Widget::leave() {}
+void Widget::click() {}
+void Widget::mousemove(int x, int y) {}
+void Widget::mousedown(int x, int y) {}
+void Widget::mouseup(int x, int y) {
+    this->click();
+}
+
+bool Widget::wantsMouse() const {
+    return false;
+}
+
+bool Widget::propagateCaptureMouse(POINT& p) {
+    auto r = this->rect();
+    if (PtInRect(&r, p) && this->wantsMouse()) return true;
+    for (auto& child : m_children) {
+        if (child->propagateCaptureMouse(p))
+            return true;
+    }
+    return false;
+}
+
+void Widget::propagateMouseEvent(POINT& p, bool down) {
+    for (auto& child : m_children) {
+        auto r = child->rect();
+        if (PtInRect(&r, p)) {
+            if (down) {
+                child->m_mousedown = true;
+                child->mousedown(p.x, p.y);
+                child->update();
+            } else {
+                child->m_mousedown = false;
+                child->mouseup(p.x, p.y);
+                child->update();
+            }
+        }
+        child->propagateMouseEvent(p, down);
+    }
+}
+
+void Widget::propagateMouseMoveEvent(POINT& p, bool down) {
+    for (auto& child : m_children) {
+        auto r = child->rect();
+        if (PtInRect(&r, p)) {
+            if (!child->m_hovered) {
+                child->m_hovered = true;
+                child->m_mousedown = down;
+                child->enter();
+            }
+            child->mousemove(p.x, p.y);
+        } else {
+            if (child->m_hovered) {
+                child->m_hovered = false;
+                child->m_mousedown = false;
+                child->leave();
+            }
+        }
+        child->propagateMouseMoveEvent(p, down);
+    }
+}
+
+void Widget::update() {
+    if (m_window) m_window->updateWindow(this->rect());
+}
+
+void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
+    for (auto& child : m_children) {
+        if (child->m_visible) child->paint(hdc, ps);
+    }
+}
 
 Widget* Widget::getParent() const {
     return m_parent;
@@ -91,10 +161,6 @@ std::vector<Widget*> Widget::getChildren() const {
     return m_children;
 }
 
-HWND Widget::getHWND() const {
-    return m_hwnd;
-}
-
 Widget::~Widget() {
     if (m_parent) {
         m_parent->remove(this, false);
@@ -102,17 +168,6 @@ Widget::~Widget() {
     for (auto& child : m_children) {
         delete child;
     }
-    g_hwnds.erase(m_hwnd);
-    if (m_hwnd) DestroyWindow(m_hwnd);
-}
-
-void Widget::init(HWND hwnd) {
-    g_hwnds[hwnd] = this;
-}
-
-Widget* Widget::fromHWND(HWND hwnd) {
-    if (!g_hwnds.count(hwnd)) return nullptr;
-    return g_hwnds.at(hwnd);
 }
 
 void ColorWidget::setColor(COLORREF color) {
@@ -125,7 +180,6 @@ COLORREF ColorWidget::getColor() const {
 
 void TextWidget::setText(std::string const& text) {
     this->m_text = text;
-    SetWindowTextA(m_hwnd, text.c_str());
 }
 
 std::string TextWidget::getText() const {
@@ -135,7 +189,6 @@ std::string TextWidget::getText() const {
 void TextWidget::setFont(std::string const& font, int size) {
     m_font = font;
     m_fontsize = size;
-    SendMessage(m_hwnd, WM_SETFONT, reinterpret_cast<WPARAM>(Manager::get()->loadFont(font, size)), true);
 }
 
 void TextWidget::setFont(std::string const& font) {

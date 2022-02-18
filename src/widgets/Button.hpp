@@ -10,23 +10,28 @@ public:
     using Callback = std::function<void(Button*)>;
 
 protected:
-    std::string m_text;
+    COLORREF m_bgColor;
     HMENU m_id;
     Callback m_callback;
+    HBRUSH m_bgBrush = nullptr;
+    HBRUSH m_hoverBrush = nullptr;
+    HBRUSH m_clickBrush = nullptr;
+    HPEN m_pen = nullptr;
 
-    void updateParent() override;
-    void paint(DRAWITEMSTRUCT*) override;
+    void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
 public:
     Button(std::string const& text);
     virtual ~Button();
 
-    void click();
+    bool wantsMouse() const override;
+
+    void enter() override;
+    void leave() override;
+
+    void setBG(COLORREF);
+    COLORREF getBG() const;
+
+    void click() override;
     void setCallback(Callback cb);
-
-    static Button* fromHMENU(HMENU menu);
-
-    LRESULT paint(NMCUSTOMDRAW*);
-
-    static LRESULT WndProc(HWND, UINT, WPARAM, LPARAM);
 };

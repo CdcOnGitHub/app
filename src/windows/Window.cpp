@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <dwmapi.h>
 #include <Button.hpp>
+#include <windowsx.h>
 
 static std::unordered_map<HWND, Window*> g_windows;
 
@@ -97,8 +98,37 @@ Window::Window(std::string const& title, int width, int height) {
     this->center();
 }
 
+void Window::show() {
+    Widget::show();
+    ShowWindow(m_hwnd, SW_SHOW);
+}
+
+void Window::hide() {
+    Widget::hide();
+    ShowWindow(m_hwnd, SW_HIDE);
+}
+
+void Window::move(int x, int y) {
+    Widget::move(x, y);
+    SetWindowPos(m_hwnd, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+}
+
+HWND Window::getHWND() const {
+    return m_hwnd;
+}
+
+void Window::updateWindow(RECT rc) {
+    InvalidateRect(m_hwnd, &rc, true);
+}
+
 Window::~Window() {
     g_windows.erase(m_hwnd);
+}
+
+void Window::add(Widget* child) {
+    Widget::add(child);
+    child->setWindow(this);
+    this->updateWindow(child->rect());
 }
 
 void Window::center() {
@@ -119,19 +149,49 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         case WM_NCHITTEST: {
             LRESULT hit = DefWindowProc(m_hwnd, msg, wp, lp);
             if (this->isFullscreen()) return hit;
+            
+            POINT p;
+            p.x = GET_X_LPARAM(lp);
+            p.y = GET_Y_LPARAM(lp);
+            MapWindowPoints(nullptr, m_hwnd, &p, 1);
+            if (this->propagateCaptureMouse(p)) return hit;
+            this->propagateMouseMoveEvent(p, m_mousedown);
+            
             if (hit == HTCLIENT) hit = HTCAPTION;
+            
             return hit;
         } break;
-
-        case WM_DRAWITEM: {
-            auto dis = reinterpret_cast<DRAWITEMSTRUCT*>(lp);
-            auto widget = Widget::fromHWND(dis->hwndItem);
-            if (widget) widget->paint(dis);
+    
+        case WM_PAINT: {
+            PAINTSTRUCT ps;
+            auto hdc = BeginPaint(m_hwnd, &ps);
+            this->paint(hdc, &ps);
+            EndPaint(m_hwnd, &ps);
+            return 0;
         } break;
 
-        case WM_COMMAND: {
-            auto btn = Button::fromHMENU(reinterpret_cast<HMENU>(LOWORD(wp)));
-            if (btn) btn->click();
+        case WM_LBUTTONDOWN: {
+            POINT p;
+            p.x = GET_X_LPARAM(lp);
+            p.y = GET_Y_LPARAM(lp);
+            m_mousedown = true;
+            this->propagateMouseEvent(p, true);
+        } break;
+
+        case WM_LBUTTONUP: {
+            POINT p;
+            p.x = GET_X_LPARAM(lp);
+            p.y = GET_Y_LPARAM(lp);
+            m_mousedown = false;
+            this->propagateMouseEvent(p, false);
+        } break;
+
+        case WM_MOUSEMOVE: {
+            POINT p;
+            p.x = GET_X_LPARAM(lp);
+            p.y = GET_Y_LPARAM(lp);
+            m_mousedown = wp & MK_LBUTTON;
+            this->propagateMouseMoveEvent(p, wp & MK_LBUTTON);
         } break;
 
         case WM_SIZE: {

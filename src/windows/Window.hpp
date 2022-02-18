@@ -7,6 +7,7 @@
 
 class Window : public Widget {
 protected:
+    HWND m_hwnd = nullptr;
     std::string m_title;
     bool m_fullscreen = false;
 
@@ -15,9 +16,17 @@ public:
     Window() = delete;
     virtual ~Window();
 
+    void add(Widget* child) override;
+    void updateWindow(RECT rc);
+    void show() override;
+    void hide() override;
+    void move(int x, int y) override;
+
     void center();
     void setTitle(std::string const&);
     bool isFullscreen() const;
+
+    HWND getHWND() const;
 
     LRESULT proc(UINT msg, WPARAM wparam, LPARAM lparam);
 

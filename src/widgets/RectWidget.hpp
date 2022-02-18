@@ -5,12 +5,13 @@
 class RectWidget : public ColorWidget {
 protected:
     HBRUSH m_brush = nullptr;
-
-    void updateParent() override;
+    int m_cornerRadius = 0;
 
 public:
     RectWidget();
     virtual ~RectWidget();
 
-    void paint(DRAWITEMSTRUCT*) override;
+    void setCornerRadius(int c);
+
+    void paint(HDC, PAINTSTRUCT*) override;
 };
