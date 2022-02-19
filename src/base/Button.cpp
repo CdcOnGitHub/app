@@ -47,10 +47,6 @@ HCURSOR Button::cursor() const {
 }
 
 void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
-    if (!m_bgBrush) m_bgBrush = CreateSolidBrush(m_bgColor);
-    if (!m_hoverBrush) m_hoverBrush = CreateSolidBrush(color_utils::lighten(m_bgColor, 50));
-    if (!m_clickBrush) m_clickBrush = CreateSolidBrush(color_utils::darken(m_bgColor, 50));
-    if (!m_pen) m_pen = CreatePen(PS_SOLID, 1, m_bgColor);
     auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
 
     if (m_autoresize) {
@@ -62,8 +58,15 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
 
     auto r = this->rect();
 
-    auto oldPen = SelectObject(hdc, m_pen);
-    auto oldBrush = SelectObject(hdc, m_mousedown ? m_clickBrush : (m_hovered ? m_hoverBrush : m_bgBrush));
+    auto oldPen = SelectObject(hdc, this->pen(m_bgColor));
+    auto oldBrush = SelectObject(hdc,
+        m_mousedown ?
+            this->brush(color_utils::darken(m_bgColor, 50)) :
+        (m_hovered ?
+            this->brush(color_utils::lighten(m_bgColor, 50)) :
+            this->brush(m_bgColor)
+        )
+    );
     RoundRect(hdc, r.left, r.top, r.right, r.bottom, 10, 10);
     SelectObject(hdc, oldBrush);
     SelectObject(hdc, oldPen);

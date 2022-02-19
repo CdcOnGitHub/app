@@ -52,7 +52,7 @@ Window::Window(std::string const& title, int width, int height) {
     wcex.hInstance      = Manager::get()->getInst();
     wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = CreateSolidBrush(RGB(0x26, 0x24, 0x2d));
+    wcex.hbrBackground  = this->brush(Style::BG());
     wcex.lpszMenuName   = nullptr;
     wcex.lpszClassName  = className.c_str();
     wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
@@ -130,6 +130,18 @@ void Window::updateWindow(RECT rc) {
     InvalidateRect(m_hwnd, &rc, true);
 }
 
+void Window::updateWindow() {
+    RECT rc;
+    GetClientRect(m_hwnd, &rc);
+    this->updateWindow(rc);
+}
+
+void Window::updateAll() {
+    for (auto [_, wnd] : g_windows) {
+        wnd->updateWindow();
+    }
+}
+
 void Window::add(Widget* child) {
     Widget::add(child);
     child->setWindow(this);
@@ -147,6 +159,11 @@ void Window::center() {
 
 bool Window::isFullscreen() const {
     return m_fullscreen;
+}
+
+void Window::paint(HDC hdc, PAINTSTRUCT* ps) {
+    FillRect(hdc, &ps->rcPaint, this->brush(Style::BG()));
+    Widget::paint(hdc, ps);
 }
 
 LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {

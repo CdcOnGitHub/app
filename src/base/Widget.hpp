@@ -6,6 +6,10 @@
 #include <stdexcept>
 #include "../Manager.hpp"
 #include <utils.hpp>
+#include <Style.hpp>
+#include <string>
+#include <dwmapi.h>
+#include <functional>
 
 class Window;
 
@@ -23,7 +27,8 @@ protected:
     Widget* m_parent = nullptr;
     Window* m_window = nullptr;
     std::vector<Widget*> m_children;
-    static HBRUSH s_tabBrush;
+    std::unordered_map<COLORREF, HBRUSH> m_brushes;
+    std::unordered_map<std::string, HPEN> m_pens;
     static Widget* s_hoveredWidget;
 
     void updatePosition();
@@ -32,6 +37,9 @@ protected:
     void propagateMouseEvent(POINT& p, bool down);
     bool propagateTabEvent(int& index, int target);
     bool propagateCaptureMouse(POINT& p);
+
+    HBRUSH brush(COLORREF);
+    HPEN pen(COLORREF color, int size = 1, int style = PS_SOLID);
 
     friend class Window;
 
@@ -60,6 +68,9 @@ public:
     virtual void mouseup(int x, int y);
     virtual void mousemove(int x, int y);
     virtual bool wantsMouse() const;
+
+    int width() const;
+    int height() const;
 
     virtual HCURSOR cursor() const;
 

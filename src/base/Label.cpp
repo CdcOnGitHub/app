@@ -4,7 +4,7 @@
 Label::Label(std::string const& text) {
     this->setText(text);
     this->setFont("Segoe UI");
-    this->setColor(RGB(255, 255, 255));
+    this->setColor(Style::text());
     this->autoresize();
     this->show();
 }

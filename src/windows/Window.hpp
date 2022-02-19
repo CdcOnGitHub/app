@@ -20,9 +20,13 @@ public:
 
     void add(Widget* child) override;
     void updateWindow(RECT rc);
+    void updateWindow();
+    void paint(HDC, PAINTSTRUCT*) override;
     void show() override;
     void hide() override;
     void move(int x, int y) override;
+
+    static void updateAll();
 
     void center();
     void setTitle(std::string const&);

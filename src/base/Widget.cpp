@@ -1,7 +1,6 @@
 #include "Widget.hpp"
 #include <Window.hpp>
 
-HBRUSH Widget::s_tabBrush = nullptr;
 Widget* Widget::s_hoveredWidget = nullptr;
 
 void Widget::add(Widget* child) {
@@ -78,10 +77,12 @@ void Widget::autoresize() {
 
 void Widget::show() {
     m_visible = true;
+    this->update();
 }
 
 void Widget::hide() {
     m_visible = false;
+    this->update();
 }
 
 void Widget::enter() {}
@@ -187,18 +188,34 @@ Widget* Widget::propagateMouseMoveEvent(POINT& p, bool down) {
 }
 
 void Widget::update() {
-    if (m_window) m_window->updateWindow(this->rect());
+    if (m_window) m_window->updateWindow();
 }
 
 void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (m_tabbed) {
-        if (!s_tabBrush) s_tabBrush = CreateSolidBrush(RGB(255, 255, 180));
         auto r = this->rect();
-        FrameRect(hdc, &r, s_tabBrush);
+        FrameRect(hdc, &r, this->brush(Style::tab()));
     }
     for (auto& child : m_children) {
         if (child->m_visible) child->paint(hdc, ps);
     }
+}
+
+HBRUSH Widget::brush(COLORREF color) {
+    if (m_brushes.count(color))
+        return m_brushes.at(color);
+    auto b = CreateSolidBrush(color);
+    m_brushes[color] = b;
+    return b;
+}
+
+HPEN Widget::pen(COLORREF color, int size, int style) {
+    auto id = std::to_string(color) + "." + std::to_string(style) + "." + std::to_string(size);
+    if (m_pens.count(id))
+        return m_pens.at(id);
+    auto b = CreatePen(style, size, color);
+    m_pens[id] = b;
+    return b;
 }
 
 HCURSOR Widget::cursor() const {
@@ -217,10 +234,19 @@ Widget::~Widget() {
     if (m_parent) {
         m_parent->remove(this, false);
     }
+    for (auto [_, b] : m_brushes) {
+        DeleteObject(b);
+    }
+    for (auto [_, b] : m_pens) {
+        DeleteObject(b);
+    }
     for (auto& child : m_children) {
         delete child;
     }
 }
+
+int Widget::width() const { return m_width; }
+int Widget::height() const { return m_height; }
 
 void ColorWidget::setColor(COLORREF color) {
     m_color = color;

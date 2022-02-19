@@ -1,6 +1,7 @@
 #include "Manager.hpp"
 #include "windows/Window.hpp"
 #include <ShellScalingApi.h>
+#include <fstream>
 
 static Manager* g_manager = new Manager();
 
@@ -15,7 +16,14 @@ Manager* Manager::setup(HINSTANCE inst) {
         MessageBoxA(nullptr, "Unable to attach console", "wtf", MB_ICONERROR);
     }
     #endif
+    g_manager->load();
+    g_manager->theme();
+    g_manager->m_dataLoaded = true;
     return g_manager;
+}
+
+void Manager::setTheme(Theme::Default theme) {
+    m_theme = theme;
 }
 
 Manager* Manager::get() {
@@ -28,6 +36,38 @@ void Manager::run(Window* window) {
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+    }
+    this->save();
+}
+
+void Manager::load() {
+    wchar_t buff[MAX_PATH];
+    if (GetModuleFileNameW(nullptr, buff, sizeof buff)) {
+        std::filesystem::path path = buff;
+        path = path.parent_path() / "settings";
+        if (std::filesystem::exists(path)) {
+            int version = 0;
+            std::ifstream file(path, std::ios::binary);
+            if (!file.is_open()) return;
+            file.read(reinterpret_cast<char*>(&version), sizeof version);
+            if (version != 1) return;
+            int theme = 0;
+            file.read(reinterpret_cast<char*>(&theme), sizeof theme);
+            m_theme = static_cast<Theme::Default>(theme);
+        }
+    }
+}
+
+void Manager::save() {
+    wchar_t buff[MAX_PATH];
+    if (GetModuleFileNameW(nullptr, buff, sizeof buff)) {
+        std::filesystem::path path = buff;
+        path = path.parent_path() / "settings";
+        std::ofstream file(path, std::ios_base::out | std::ios::binary);
+        if (!file.is_open()) return;
+        int version = 1;
+        file.write(reinterpret_cast<const char*>(&version), sizeof version);
+        file.write(reinterpret_cast<const char*>(&m_theme), sizeof m_theme);
     }
 }
 
@@ -94,4 +134,24 @@ float Manager::getDPIScale(HWND hwnd) {
     return (m_mainWindow ?
         GetDpiForWindow(m_mainWindow->getHWND()) :
         GetDpiForSystem()) / 96.f;
+}
+
+Theme::Default Manager::theme() {
+    if (m_dataLoaded) {
+        return m_theme;
+    }
+    HKEY key;
+    if (RegOpenKeyA(
+        HKEY_CURRENT_USER,
+        "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        &key
+    ) != ERROR_SUCCESS) {
+        return m_theme;
+    }
+    DWORD value;
+    DWORD size = sizeof value;
+    if (RegGetValueA(key, nullptr, nullptr, RRF_RT_REG_DWORD, 0, &value, &size) == ERROR_SUCCESS) {
+        m_theme = value ? Theme::Default::Light : Theme::Default::Dark;
+    }
+    return m_theme;
 }
