@@ -57,15 +57,20 @@ HCURSOR Checkbox::cursor() const {
     return hand;
 }
 
-void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
+void Checkbox::updateSize(HDC hdc, SIZE available) {
     auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
-
     if (m_autoresize) {
         SIZE size;
         GetTextExtentPoint32A(hdc, m_text.c_str(), static_cast<int>(m_text.size()), &size);
         this->resize(size.cx + 40, size.cy);
         m_autoresize = true;
     }
+    SelectObject(hdc, oldFont);
+    Widget::updateSize(hdc, available);
+}
+
+void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
+    auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
 
     auto r = this->rect();
     auto h = r.bottom - r.top;

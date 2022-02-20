@@ -10,11 +10,12 @@ protected:
     Callback m_callback;
     bool m_checked = false;
 
-    void paint(HDC hdc, PAINTSTRUCT* ps) override;
-
 public:
     Checkbox(std::string const& text, bool checked = false);
     virtual ~Checkbox();
+
+    void updateSize(HDC hdc, SIZE available) override;
+    void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
     bool wantsMouse() const override;
 

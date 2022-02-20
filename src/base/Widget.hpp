@@ -47,6 +47,7 @@ public:
     virtual ~Widget();
 
     virtual void paint(HDC hdc, PAINTSTRUCT* ps);
+    virtual void updateSize(HDC hdc, SIZE available);
 
     Widget* getParent() const;
     std::vector<Widget*> getChildren() const;
@@ -69,8 +70,11 @@ public:
     virtual void mousemove(int x, int y);
     virtual bool wantsMouse() const;
 
+    int x() const;
+    int y() const;
     int width() const;
     int height() const;
+    bool visible() const;
 
     virtual HCURSOR cursor() const;
 

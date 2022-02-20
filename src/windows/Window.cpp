@@ -93,6 +93,8 @@ Window::Window(std::string const& title, int width, int height) {
     // FreeLibrary(hm);
 
     m_hwnd = hwnd;
+    m_width = width;
+    m_height = height;
 
     g_windows[hwnd] = this;
 
@@ -187,6 +189,12 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         case WM_PAINT: {
             PAINTSTRUCT ps;
             auto hdc = BeginPaint(m_hwnd, &ps);
+            // temporary fix for Layouts being incorrect 
+            // on first paint due to child sizes not 
+            // having been calculated yet
+            // todo: better fix than calling updateSize
+            // twice
+            this->updateSize(hdc, { m_width, m_height });
             this->paint(hdc, &ps);
             EndPaint(m_hwnd, &ps);
             return 0;
@@ -246,6 +254,8 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
 
         case WM_SIZE: {
             m_fullscreen = wp == SIZE_MAXIMIZED;
+            m_width = LOWORD(lp);
+            m_height = HIWORD(lp);
         } break;
     }
     return DefWindowProc(m_hwnd, msg, wp, lp);

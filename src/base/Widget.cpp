@@ -191,6 +191,12 @@ void Widget::update() {
     if (m_window) m_window->updateWindow();
 }
 
+void Widget::updateSize(HDC hdc, SIZE size) {
+    for (auto& child : m_children) {
+        if (child->m_visible) child->updateSize(hdc, size);
+    }
+}
+
 void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (m_tabbed) {
         auto r = this->rect();
@@ -245,8 +251,11 @@ Widget::~Widget() {
     }
 }
 
+int Widget::x() const { return m_x; }
+int Widget::y() const { return m_y; }
 int Widget::width() const { return m_width; }
 int Widget::height() const { return m_height; }
+bool Widget::visible() const { return m_visible; }
 
 void ColorWidget::setColor(COLORREF color) {
     m_color = color;

@@ -10,11 +10,12 @@ protected:
     COLORREF m_bgColor;
     Callback m_callback;
 
-    void paint(HDC hdc, PAINTSTRUCT* ps) override;
-
 public:
     Button(std::string const& text);
     virtual ~Button();
+
+    void updateSize(HDC hdc, SIZE) override;
+    void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
     bool wantsMouse() const override;
 

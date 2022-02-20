@@ -9,7 +9,7 @@ Label::Label(std::string const& text) {
     this->show();
 }
 
-void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
+void Label::updateSize(HDC hdc, SIZE available) {
     auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
     if (m_autoresize) {
         SIZE size;
@@ -17,6 +17,13 @@ void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
         this->resize(size.cx, size.cy);
         m_autoresize = true;
     }
+    SelectObject(hdc, oldFont);
+
+    Widget::updateSize(hdc, available);
+}
+
+void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
+    auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
     auto rect = this->rect();
     SetBkMode(hdc, TRANSPARENT);
     SetTextColor(hdc, m_color);
