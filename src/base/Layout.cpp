@@ -27,8 +27,8 @@ bool Pad::doesExpand() const {
 }
 
 void Layout::updateSize(HDC hdc, SIZE available) {
-    this->arrange(available);
     Widget::updateSize(hdc, available);
+    this->arrange(available);
 }
 
 void Layout::pad(int p) {

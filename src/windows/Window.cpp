@@ -189,11 +189,6 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         case WM_PAINT: {
             PAINTSTRUCT ps;
             auto hdc = BeginPaint(m_hwnd, &ps);
-            // temporary fix for Layouts being incorrect 
-            // on first paint due to child sizes not 
-            // having been calculated yet
-            // todo: better fix than calling updateSize
-            // twice
             this->updateSize(hdc, { m_width, m_height });
             this->paint(hdc, &ps);
             EndPaint(m_hwnd, &ps);
