@@ -2,18 +2,21 @@
 
 #include <Windows.h>
 #include <string>
+#include <gdiplus.h>
+
+using namespace Gdiplus;
 
 #define DEF_THEME_GETTER(_var_) \
-    inline static COLORREF _var_() { return Style::current()->m_theme.m_##_var_; }
+    inline static Color const& _var_() { return Style::current()->m_theme.m_##_var_; }
 
 struct Theme {
     std::string m_id;
-    COLORREF m_BG;
-    COLORREF m_text;
-    COLORREF m_primary;
-    COLORREF m_secondary;
-    COLORREF m_tab;
-    COLORREF m_separator;
+    Color m_BG;
+    Color m_text;
+    Color m_primary;
+    Color m_secondary;
+    Color m_tab;
+    Color m_separator;
 
     enum class Default {
         Light, Dark,

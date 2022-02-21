@@ -48,25 +48,25 @@ void Widget::setWindow(Window* window) {
     }
 }
 
-POINT Widget::offset() const {
-    POINT p;
-    p.x = m_x;
-    p.y = m_y;
+Point Widget::offset() const {
+    Point p;
+    p.X = m_x;
+    p.Y = m_y;
     if (m_parent && !dynamic_cast<Window*>(m_parent)) {
         auto add = m_parent->offset();
-        p.x += add.x;
-        p.y += add.y;
+        p.X += add.X;
+        p.Y += add.Y;
     }
     return p;
 }
 
-RECT Widget::rect() const {
+Rect Widget::rect() const {
     auto p = this->offset();
-    RECT r;
-    r.left = p.x;
-    r.top = p.y;
-    r.right = p.x + m_width;
-    r.bottom = p.y + m_height;
+    Rect r;
+    r.X = p.X;
+    r.Y = p.Y;
+    r.Width = m_width;
+    r.Height = m_height;
     return r;
 }
 
@@ -129,9 +129,9 @@ bool Widget::wantsMouse() const {
     return false;
 }
 
-bool Widget::propagateCaptureMouse(POINT& p) {
+bool Widget::propagateCaptureMouse(Point& p) {
     auto r = this->rect();
-    if (PtInRect(&r, p) && this->wantsMouse()) return true;
+    if (r.Contains(p) && this->wantsMouse()) return true;
     for (auto& child : m_children) {
         if (child->propagateCaptureMouse(p))
             return true;
@@ -155,19 +155,19 @@ bool Widget::propagateTabEvent(int& index, int target) {
     return false;
 }
 
-void Widget::propagateMouseEvent(POINT& p, bool down) {
+void Widget::propagateMouseEvent(Point& p, bool down) {
     for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
         auto child = *it;
         if (child->wantsMouse()) {
             auto r = child->rect();
-            if (PtInRect(&r, p)) {
+            if (r.Contains(p)) {
                 if (down) {
                     child->m_mousedown = true;
-                    child->mousedown(p.x, p.y);
+                    child->mousedown(p.X, p.Y);
                     child->update();
                 } else {
                     child->m_mousedown = false;
-                    child->mouseup(p.x, p.y);
+                    child->mouseup(p.X, p.Y);
                     child->update();
                 }
             }
@@ -178,20 +178,20 @@ void Widget::propagateMouseEvent(POINT& p, bool down) {
     }
 }
 
-Widget* Widget::propagateMouseMoveEvent(POINT& p, bool down) {
+Widget* Widget::propagateMouseMoveEvent(Point& p, bool down) {
     Widget* ret = nullptr;
     for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
         auto child = *it;
         if (child->wantsMouse()) {
             auto r = child->rect();
-            if (PtInRect(&r, p)) {
+            if (r.Contains(p)) {
                 if (!child->m_hovered) {
                     child->m_hovered = true;
                     child->m_mousedown = down;
                     child->enter();
                 }
                 ret = child;
-                child->mousemove(p.x, p.y);
+                child->mousemove(p.X, p.Y);
             } else {
                 if (child->m_hovered) {
                     child->m_hovered = false;
@@ -220,29 +220,11 @@ void Widget::updateSize(HDC hdc, SIZE size) {
 
 void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (m_tabbed) {
-        auto r = this->rect();
-        FrameRect(hdc, &r, this->brush(Style::tab()));
+        Graphics(hdc).DrawRectangle(&Pen(Style::tab()), toRectF(this->rect()));
     }
     for (auto& child : m_children) {
         if (child->m_visible) child->paint(hdc, ps);
     }
-}
-
-HBRUSH Widget::brush(COLORREF color) {
-    if (m_brushes.count(color))
-        return m_brushes.at(color);
-    auto b = CreateSolidBrush(color);
-    m_brushes[color] = b;
-    return b;
-}
-
-HPEN Widget::pen(COLORREF color, int size, int style) {
-    auto id = std::to_string(color) + "." + std::to_string(style) + "." + std::to_string(size);
-    if (m_pens.count(id))
-        return m_pens.at(id);
-    auto b = CreatePen(style, size, color);
-    m_pens[id] = b;
-    return b;
 }
 
 HCURSOR Widget::cursor() const {
@@ -275,11 +257,11 @@ int Widget::width() const { return m_width; }
 int Widget::height() const { return m_height; }
 bool Widget::visible() const { return m_visible; }
 
-void ColorWidget::color(COLORREF color) {
+void ColorWidget::color(Color color) {
     m_color = color;
 }
 
-COLORREF ColorWidget::getColor() const {
+Color ColorWidget::color() const {
     return m_color;
 }
 
@@ -291,15 +273,15 @@ std::string TextWidget::getText() const {
     return m_text;
 }
 
-void TextWidget::setFont(std::string const& font, int size) {
+void TextWidget::font(std::string const& font, int size) {
     m_font = font;
     m_fontsize = size;
 }
 
-void TextWidget::setFont(std::string const& font) {
-    this->setFont(font, m_fontsize);
+void TextWidget::font(std::string const& font) {
+    this->font(font, m_fontsize);
 }
 
-void TextWidget::setFontSize(int size) {
-    this->setFont(m_font, size);
+void TextWidget::fontSize(int size) {
+    this->font(m_font, size);
 }

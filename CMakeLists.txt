@@ -8,7 +8,11 @@ file(GLOB_RECURSE SOURCES src/*.cpp GeodeApp.exe.manifest)
 
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 
-set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp)
+if (CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp64)
+else()
+    set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp32)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
     src
@@ -18,5 +22,5 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     src/utils
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC
-    dwmapi shcore
+    dwmapi shcore gdiplus uxtheme
 )

@@ -35,15 +35,12 @@ protected:
 
     void updatePosition();
     void setWindow(Window*);
-    Widget* propagateMouseMoveEvent(POINT& p, bool down);
-    void propagateMouseEvent(POINT& p, bool down);
+    Widget* propagateMouseMoveEvent(Point& p, bool down);
+    void propagateMouseEvent(Point& p, bool down);
     bool propagateTabEvent(int& index, int target);
-    bool propagateCaptureMouse(POINT& p);
+    bool propagateCaptureMouse(Point& p);
     void captureMouse();
     void releaseMouse();
-
-    HBRUSH brush(COLORREF);
-    HPEN pen(COLORREF color, int size = 1, int style = PS_SOLID);
 
     friend class Window;
 
@@ -83,30 +80,30 @@ public:
 
     virtual HCURSOR cursor() const;
 
-    POINT offset() const;
-    RECT rect() const;
+    Point offset() const;
+    Rect rect() const;
 };
 
 class ColorWidget : public Widget {
 protected:
-    COLORREF m_color;
+    Color m_color;
 
 public:
-    virtual void color(COLORREF color);
-    COLORREF getColor() const;
+    virtual void color(Color color);
+    Color color() const;
 };
 
 class TextWidget : public ColorWidget {
 protected:
     std::string m_text;
     std::string m_font;
-    int m_fontsize = 20;
+    int m_fontsize = 20_px;
 
 public:
     virtual void text(std::string const& text);
     std::string getText() const;
 
-    void setFont(std::string const& font);
-    virtual void setFont(std::string const& font, int size);
-    virtual void setFontSize(int size = 20);
+    void font(std::string const& font);
+    virtual void font(std::string const& font, int size);
+    virtual void fontSize(int size = 20);
 };

@@ -4,6 +4,7 @@
 #include <RectWidget.hpp>
 #include <Checkbox.hpp>
 #include <Layout.hpp>
+#include <Tab.hpp>
 #include "TestWindow.hpp"
 
 MainWindow::MainWindow() : Window("Geode App", 800, 600) {
@@ -11,7 +12,20 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     layout->hideSeparatorLine();
 
     auto left = new RectWidget();
-    left->color(RGB(25, 24, 30));
+    left->color({ 25, 24, 30 });
+    auto vleft = new Tabs(new VerticalLayout());
+    vleft->add(new Tab("General"));
+    vleft->add(new Tab("Advanced"));
+    vleft->add(new Tab("Tools"));
+    vleft->add(new TabSeparator());
+    vleft->add(new Tab("Vanilla"));
+    vleft->add(new Tab("Gay sex"));
+    vleft->add(new Tab("Homosexual geckos"));
+    vleft->add(new Tab("Femboy Hooters"));
+    vleft->add(new Tab("Catgirls"));
+    vleft->add(new Pad(true));
+    vleft->add(new Tab("Settings"));
+    left->add(vleft);
     layout->first(left);
 
     auto right = new VerticalLayout();
@@ -24,9 +38,11 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     });
     btn->bg(Style::primary());
     right->add(btn);
+    auto cbox = new Checkbox("Test");
+    right->add(cbox);
     layout->second(right);
 
-    layout->moveSplit(250);
+    layout->moveSplit(250_px);
 
     this->add(layout);
 }

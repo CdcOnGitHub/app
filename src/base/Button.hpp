@@ -7,7 +7,7 @@ public:
     using Callback = std::function<void(Button*)>;
 
 protected:
-    COLORREF m_bgColor;
+    Color m_bgColor;
     Callback m_callback;
 
 public:
@@ -19,8 +19,8 @@ public:
     bool wantsMouse() const override;
     HCURSOR cursor() const;
 
-    void bg(COLORREF);
-    COLORREF getBG() const;
+    void bg(Color const&);
+    Color bg() const;
 
     void click() override;
     void callback(Callback cb);

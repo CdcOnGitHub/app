@@ -217,15 +217,17 @@ void ResizeGrip::mousemove(int x, int y) {
 
 void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (!m_paintLine) return;
+    Graphics g(hdc);
+    g.SetSmoothingMode(SmoothingModeAntiAlias);
     auto r = this->rect();
     if (m_horizontal) {
-        r.left += (r.right - r.left) / 2;
-        r.right = r.left + 1;
-        FillRect(hdc, &r, this->brush(Style::separator()));
+        r.X += r.Width / 2;
+        r.Width = 1_px;
+        g.FillRectangle(&SolidBrush(Style::separator()), toRectF(r));
     } else {
-        r.top += (r.bottom - r.top) / 2;
-        r.bottom = r.top + 1;
-        FillRect(hdc, &r, this->brush(Style::separator()));
+        r.Y += r.Height / 2;
+        r.Height = 1_px;
+        g.FillRectangle(&SolidBrush(Style::separator()), toRectF(r));
     }
 }
 

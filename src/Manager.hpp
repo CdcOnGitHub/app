@@ -7,6 +7,10 @@
 #include <unordered_set>
 #include <Style.hpp>
 #include <filesystem>
+#include <gdiplus.h>
+#include <gdiplusheaders.h>
+
+using namespace Gdiplus;
 
 class Window;
 
@@ -20,8 +24,13 @@ protected:
     std::unordered_set<int> m_classIDs;
     Theme::Default m_theme = Theme::Default::Dark;
     bool m_dataLoaded = false;
+    int m_dpi = 0;
+    ULONG_PTR m_gdiToken;
+    Gdiplus::GdiplusStartupInput m_gdiStartupInput;
     
     std::string fontFaceID(std::string const& font, int size);
+
+    Manager* setupManager(HINSTANCE inst);
 
 public:
     static Manager* get();
@@ -45,10 +54,15 @@ public:
 
     Window* getMainWindow() const;
     HINSTANCE getInst() const;
+    void updateDPI(HWND = nullptr);
     int getDPI(HWND = nullptr);
     float getDPIScale(HWND = nullptr);
     static int scale(int val);
+    static POINT scale(POINT const& val);
 
     HCURSOR loadCursor(LPTSTR);
     static HCURSOR cursor(LPTSTR);
 };
+
+int operator"" _px(unsigned long long);
+float operator"" _pxf(long double);

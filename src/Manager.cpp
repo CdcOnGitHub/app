@@ -5,8 +5,8 @@
 
 static Manager* g_manager = new Manager();
 
-Manager* Manager::setup(HINSTANCE inst) {
-    g_manager->m_inst = inst;
+Manager* Manager::setupManager(HINSTANCE inst) {
+    m_inst = inst;
     #ifndef NDEBUG
     if (AllocConsole()) {
         FILE* dummyFile;
@@ -16,10 +16,14 @@ Manager* Manager::setup(HINSTANCE inst) {
         MessageBoxA(nullptr, "Unable to attach console", "wtf", MB_ICONERROR);
     }
     #endif
-    g_manager->load();
-    g_manager->theme();
-    g_manager->m_dataLoaded = true;
-    return g_manager;
+    this->load();
+    this->theme();
+    m_dataLoaded = true;
+    return this;
+}
+
+Manager* Manager::setup(HINSTANCE inst) {
+    return g_manager->setupManager(inst);
 }
 
 void Manager::setTheme(Theme::Default theme) {
@@ -33,10 +37,20 @@ Manager* Manager::get() {
 void Manager::run(Window* window) {
     m_mainWindow = window;
     MSG msg;
+    auto st = Gdiplus::GdiplusStartup(&m_gdiToken, &m_gdiStartupInput, nullptr);
+    if (st != Gdiplus::Ok) {
+        auto err = "Unable to initialize Gdiplus! "
+        "App may look disfigured or unusuable "
+        "(Status Code " + std::to_string(st) + ")";
+        MessageBoxA(nullptr, err.c_str(), "Warning", MB_ICONWARNING);
+    }
+    BufferedPaintInit();
     while (GetMessage(&msg, NULL, 0, 0)) {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }
+    BufferedPaintUnInit();
+    Gdiplus::GdiplusShutdown(m_gdiToken);
     this->save();
 }
 
@@ -122,22 +136,35 @@ void Manager::relinquishWindowClassID(int id) {
     m_classIDs.erase(id);
 }
 
+void Manager::updateDPI(HWND hwnd) {
+    auto hdc = GetDC(hwnd);
+    m_dpi = GetDeviceCaps(hdc, LOGPIXELSX);
+    ReleaseDC(hwnd, hdc);
+}
+
 int Manager::getDPI(HWND hwnd) {
-    if (hwnd) return GetDpiForWindow(hwnd);
-    return (m_mainWindow ?
-        GetDpiForWindow(m_mainWindow->getHWND()) :
-        GetDpiForSystem());
+    // todo: find a solution that works per-display
+    if (!m_dpi) {
+        auto hdc = GetDC(hwnd);
+        m_dpi = GetDeviceCaps(hdc, LOGPIXELSX);
+        ReleaseDC(hwnd, hdc);
+    }
+    return m_dpi;
 }
 
 float Manager::getDPIScale(HWND hwnd) {
-    if (hwnd) return GetDpiForWindow(hwnd) / 96.f;
-    return (m_mainWindow ?
-        GetDpiForWindow(m_mainWindow->getHWND()) :
-        GetDpiForSystem()) / 96.f;
+    return this->getDPI() / 96.f;
 }
 
 int Manager::scale(int val) {
     return MulDiv(val, Manager::get()->getDPI(), 96);
+}
+
+POINT Manager::scale(POINT const& val) {
+    return {
+        MulDiv(val.x, Manager::get()->getDPI(), 96),
+        MulDiv(val.y, Manager::get()->getDPI(), 96)
+    };
 }
 
 Theme::Default Manager::theme() {
@@ -169,4 +196,12 @@ HCURSOR Manager::loadCursor(LPTSTR c) {
 
 HCURSOR Manager::cursor(LPTSTR c) {
     return Manager::get()->loadCursor(c);
+}
+
+int operator"" _px(unsigned long long px) {
+    return Manager::scale(static_cast<int>(px));
+}
+
+float operator"" _pxf(long double px) {
+    return static_cast<float>(Manager::get()->getDPIScale() * px);
 }

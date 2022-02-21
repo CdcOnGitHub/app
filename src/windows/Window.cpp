@@ -52,7 +52,7 @@ Window::Window(std::string const& title, int width, int height) {
     wcex.hInstance      = Manager::get()->getInst();
     wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = this->brush(Style::BG());
+    wcex.hbrBackground  = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wcex.lpszMenuName   = nullptr;
     wcex.lpszClassName  = className.c_str();
     wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
@@ -67,7 +67,8 @@ Window::Window(std::string const& title, int width, int height) {
         title.c_str(),
         WS_OVERLAPPEDWINDOW | WS_EX_LAYERED,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        width, height,
+        Manager::scale(width),
+        Manager::scale(height),
         nullptr,
         nullptr,
         Manager::get()->getInst(),
@@ -80,16 +81,6 @@ Window::Window(std::string const& title, int width, int height) {
 
     BOOL USE_DARK_MODE = true;
     DwmSetWindowAttribute(hwnd, 20, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
-
-    // const HINSTANCE hm = LoadLibraryA("user32.dll");
-    // typedef BOOL(WINAPI*pSetWindowCompositionAttribute)(HWND, WINCOMPATTRDATA*);
-    // const pSetWindowCompositionAttribute SetWindowCompositionAttribute = (pSetWindowCompositionAttribute)GetProcAddress(hm, "SetWindowCompositionAttribute");
-    // if (SetWindowCompositionAttribute) {
-    //     ACCENTPOLICY policy = { ACCENT_ENABLE_BLURBEHIND, AF_DRAWNOBORDERS, 0, 0 };
-    //     WINCOMPATTRDATA data = { 19, &policy, sizeof(ACCENTPOLICY) };
-    //     SetWindowCompositionAttribute(hwnd, &data);
-    // }
-    // FreeLibrary(hm);
 
     m_hwnd = hwnd;
     m_type = "Window";
@@ -149,7 +140,7 @@ void Window::updateAll() {
 void Window::add(Widget* child) {
     Widget::add(child);
     child->setWindow(this);
-    this->updateWindow(child->rect());
+    this->updateWindow(toRECT(child->rect()));
 }
 
 void Window::center() {
@@ -166,7 +157,13 @@ bool Window::isFullscreen() const {
 }
 
 void Window::paint(HDC hdc, PAINTSTRUCT* ps) {
-    FillRect(hdc, &ps->rcPaint, this->brush(Style::BG()));
+    Graphics g(hdc);
+    g.FillRectangle(
+        &SolidBrush(Style::BG()),
+        ps->rcPaint.left, ps->rcPaint.top,
+        ps->rcPaint.right - ps->rcPaint.left,
+        ps->rcPaint.bottom - ps->rcPaint.top
+    );
     Widget::paint(hdc, ps);
 }
 
@@ -181,58 +178,57 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.y = GET_Y_LPARAM(lp);
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
             if (Widget::s_capturingWidget) return hit;
-            if (this->propagateCaptureMouse(p)) return hit;
-            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
+            if (this->propagateCaptureMouse(toPoint(p))) return hit;
+            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(toPoint(p), m_mousedown);
             
             if (hit == HTCLIENT) hit = HTCAPTION;
             
             return hit;
         } break;
+
+        case WM_ERASEBKGND: return true;
     
         case WM_PAINT: {
             PAINTSTRUCT ps;
             auto hdc = BeginPaint(m_hwnd, &ps);
-            this->updateSize(hdc, { m_width, m_height });
-            this->paint(hdc, &ps);
+            HDC ndc;
+            auto hpb = BeginBufferedPaint(hdc, &ps.rcPaint, BPBF_COMPATIBLEBITMAP, nullptr, &ndc);
+            this->updateSize(ndc, { m_width, m_height });
+            this->paint(ndc, &ps);
+            EndBufferedPaint(hpb, true);
             EndPaint(m_hwnd, &ps);
             return 0;
         } break;
 
         case WM_LBUTTONDOWN: {
-            POINT p;
-            p.x = GET_X_LPARAM(lp);
-            p.y = GET_Y_LPARAM(lp);
+            Point p(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
             m_mousedown = true;
             if (Widget::s_capturingWidget) {
                 Widget::s_capturingWidget->m_mousedown = true;
-                Widget::s_capturingWidget->mousedown(p.x, p.y);
+                Widget::s_capturingWidget->mousedown(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, true);
             }
         } break;
 
         case WM_LBUTTONUP: {
-            POINT p;
-            p.x = GET_X_LPARAM(lp);
-            p.y = GET_Y_LPARAM(lp);
+            Point p(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
             m_mousedown = false;
             if (Widget::s_capturingWidget) {
                 Widget::s_capturingWidget->m_mousedown = false;
-                Widget::s_capturingWidget->mouseup(p.x, p.y);
+                Widget::s_capturingWidget->mouseup(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, false);
             }
         } break;
 
         case WM_MOUSEMOVE: {
-            POINT p;
-            p.x = GET_X_LPARAM(lp);
-            p.y = GET_Y_LPARAM(lp);
+            Point p(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
             m_mousedown = wp & MK_LBUTTON;
             if (Widget::s_capturingWidget) {
                 Widget::s_hoveredWidget = Widget::s_capturingWidget;
                 Widget::s_capturingWidget->m_mousedown = m_mousedown;
-                Widget::s_capturingWidget->mousemove(p.x, p.y);
+                Widget::s_capturingWidget->mousemove(p.X, p.Y);
             } else {
                 Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
             }

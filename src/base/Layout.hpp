@@ -102,7 +102,7 @@ public:
 
 class SplitLayout : public Layout {
 protected:
-    bool m_horizontal;
+    bool m_horizontal = true;
     bool m_collapseFirst = true;
     int m_split = 0;
     Widget* m_first = nullptr;

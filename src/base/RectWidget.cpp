@@ -2,7 +2,7 @@
 
 RectWidget::RectWidget() {
     m_type = "RectWidget";
-    this->color(RGB(255, 255, 255));
+    this->color({ 255, 255, 255 });
     this->autoresize();
     this->show();
 }
@@ -22,13 +22,18 @@ void RectWidget::updateSize(HDC hdc, SIZE available) {
 
 void RectWidget::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto r = this->rect();
+
+    Graphics g(hdc);
+    g.SetSmoothingMode(SmoothingModeAntiAlias);
+
     if (m_cornerRadius) {
-        auto old = SelectObject(hdc, this->brush(m_color));
-        RoundRect(hdc, r.left, r.top, r.right, r.bottom, m_cornerRadius, m_cornerRadius);
-        SelectObject(hdc, old);
+        FillRoundRect(
+            &g, r, m_color, m_cornerRadius / 2, m_cornerRadius
+        );
     } else {
-        FillRect(hdc, &r, this->brush(m_color));
+        g.FillRectangle(&SolidBrush(m_color), toRectF(r));
     }
+    
     Widget::paint(hdc, ps);
 }
 
