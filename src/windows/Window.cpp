@@ -92,6 +92,7 @@ Window::Window(std::string const& title, int width, int height) {
     // FreeLibrary(hm);
 
     m_hwnd = hwnd;
+    m_type = "Window";
     m_width = width;
     m_height = height;
 
@@ -103,9 +104,11 @@ Window::Window(std::string const& title, int width, int height) {
 
 Window::~Window() {
     g_windows.erase(m_hwnd);
+    DestroyWindow(m_hwnd);
     auto className = "GeodeAppWindow" + std::to_string(m_classID);
-    UnregisterClassA(className.c_str(), Manager::get()->getInst());
-    Manager::get()->relinquishWindowClassID(m_classID);
+    if (UnregisterClassA(className.c_str(), Manager::get()->getInst())) {
+        Manager::get()->relinquishWindowClassID(m_classID);
+    }
 }
 
 void Window::show() {
@@ -273,8 +276,13 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
 }
 
 LRESULT CALLBACK Window::WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-    if (msg == WM_DESTROY && hwnd == Manager::get()->getMainWindow()->getHWND()) {
-        PostQuitMessage(0);
+    if (msg == WM_DESTROY) {
+        if (hwnd == Manager::get()->getMainWindow()->getHWND()) {
+            PostQuitMessage(0);
+        }
+        if (g_windows.count(hwnd)) {
+            delete g_windows[hwnd];
+        }
         return 0;
     }
     if (g_windows.count(hwnd)) {

@@ -4,6 +4,10 @@
 Widget* Widget::s_hoveredWidget = nullptr;
 Widget* Widget::s_capturingWidget = nullptr;
 
+const char* Widget::type() const {
+    return m_type;
+}
+
 void Widget::captureMouse() {
     if (!s_capturingWidget) {
         s_capturingWidget = this;
@@ -254,9 +258,6 @@ std::vector<Widget*> Widget::getChildren() const {
 }
 
 Widget::~Widget() {
-    if (m_parent) {
-        m_parent->remove(this, false);
-    }
     for (auto [_, b] : m_brushes) {
         DeleteObject(b);
     }
@@ -274,7 +275,7 @@ int Widget::width() const { return m_width; }
 int Widget::height() const { return m_height; }
 bool Widget::visible() const { return m_visible; }
 
-void ColorWidget::setColor(COLORREF color) {
+void ColorWidget::color(COLORREF color) {
     m_color = color;
 }
 

@@ -25,5 +25,5 @@ public:
     bool checked() const;
 
     void click() override;
-    void setCallback(Callback cb);
+    void callback(Callback cb);
 };

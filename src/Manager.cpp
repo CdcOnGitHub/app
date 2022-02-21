@@ -159,3 +159,14 @@ Theme::Default Manager::theme() {
     }
     return m_theme;
 }
+
+HCURSOR Manager::loadCursor(LPTSTR c) {
+    if (!m_cursors.count(c)) {
+        m_cursors[c] = LoadCursor(nullptr, c);
+    }
+    return m_cursors.at(c);
+}
+
+HCURSOR Manager::cursor(LPTSTR c) {
+    return Manager::get()->loadCursor(c);
+}

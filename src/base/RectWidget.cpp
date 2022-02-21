@@ -1,7 +1,8 @@
 #include "RectWidget.hpp"
 
 RectWidget::RectWidget() {
-    this->setColor(RGB(255, 255, 255));
+    m_type = "RectWidget";
+    this->color(RGB(255, 255, 255));
     this->autoresize();
     this->show();
 }

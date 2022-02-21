@@ -1,16 +1,19 @@
 #include "Layout.hpp"
 
 Pad::Pad(bool exp) {
+    m_type = "Pad";
     m_expand = exp;
     this->show();
 }
 
 Pad::Pad(int size) {
+    m_type = "Pad";
     this->resize(size);
     this->show();
 }
 
 Pad::Pad() {
+    m_type = "Pad";
     this->show();
 }
 
@@ -37,6 +40,7 @@ void Layout::pad(int p) {
 }
 
 HorizontalLayout::HorizontalLayout() {
+    m_type = "HorizontalLayout";
     this->autoresize();
     this->show();
 }
@@ -97,6 +101,7 @@ void HorizontalLayout::arrange(SIZE available) {
 }
 
 VerticalLayout::VerticalLayout() {
+    m_type = "VerticalLayout";
     this->autoresize();
     this->show();
 }
@@ -156,51 +161,46 @@ void VerticalLayout::arrange(SIZE available) {
     }
 }
 
-Separator::Separator(SplitLayout* l) {
+ResizeGrip::ResizeGrip(SplitLayout* l) {
+    m_type = "ResizeGrip";
     m_layout = l;
     this->show();
 }
 
-void Separator::direct(bool horizontal) {
+void ResizeGrip::direct(bool horizontal) {
     m_horizontal = horizontal;
     this->update();
 }
 
-bool Separator::horizontal() const {
+bool ResizeGrip::horizontal() const {
     return m_horizontal;
 }
 
-int Separator::pos() const {
+int ResizeGrip::pos() const {
     return m_pos + m_moved;
 }
 
-bool Separator::wantsMouse() const {
+bool ResizeGrip::wantsMouse() const {
     return true;
 }
 
-HCURSOR Separator::cursor() const {
-    if (m_horizontal) {
-        static auto hc = LoadCursor(nullptr, IDC_SIZEWE);
-        return hc;
-    } else {
-        static auto hc = LoadCursor(nullptr, IDC_SIZENS);
-        return hc;
-    }
+HCURSOR ResizeGrip::cursor() const {
+    return Manager::cursor(m_horizontal ? IDC_SIZEWE : IDC_SIZENS);
 }
 
-void Separator::mousedown(int x, int y) {
+void ResizeGrip::mousedown(int x, int y) {
     this->captureMouse();
     m_mousestart = { x, y };
     m_pos = m_x + s_size;
     this->update();
 }
 
-void Separator::mouseup(int x, int y) {
+void ResizeGrip::mouseup(int x, int y) {
     this->releaseMouse();
     this->update();
 }
 
-void Separator::mousemove(int x, int y) {
+void ResizeGrip::mousemove(int x, int y) {
     if (m_mousedown) {
         if (m_horizontal) {
             m_moved = x - m_mousestart.x;
@@ -215,7 +215,7 @@ void Separator::mousemove(int x, int y) {
     }
 }
 
-void Separator::paint(HDC hdc, PAINTSTRUCT* ps) {
+void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (!m_paintLine) return;
     auto r = this->rect();
     if (m_horizontal) {
@@ -229,13 +229,14 @@ void Separator::paint(HDC hdc, PAINTSTRUCT* ps) {
     }
 }
 
-void Separator::hideline() {
+void ResizeGrip::hideline() {
     m_paintLine = false;
     this->update();
 }
 
 SplitLayout::SplitLayout() {
-    m_separator = new Separator(this);
+    m_type = "SplitLayout";
+    m_separator = new ResizeGrip(this);
     this->add(m_separator);
     this->show();
 }
@@ -302,9 +303,9 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
         ssize.cx = size.cx - m_split;
         spos.x = m_split;
         spos.y = 0;
-        seppos.x = m_split - Separator::s_size;
+        seppos.x = m_split - ResizeGrip::s_size;
         seppos.y = 0;
-        sepsize.cx = Separator::s_size * 2;
+        sepsize.cx = ResizeGrip::s_size * 2;
         sepsize.cy = size.cy;
     } else {
         fsize.cy = m_split;
@@ -312,9 +313,9 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
         spos.x = 0;
         spos.y = m_split;
         seppos.x = 0;
-        seppos.y =  m_split - Separator::s_size;
+        seppos.y =  m_split - ResizeGrip::s_size;
         sepsize.cx = size.cx;
-        sepsize.cy = Separator::s_size * 2;
+        sepsize.cy = ResizeGrip::s_size * 2;
     }
     m_first->updateSize(hdc, fsize);
     m_second->updateSize(hdc, ssize);

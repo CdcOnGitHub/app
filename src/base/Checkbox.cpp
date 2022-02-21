@@ -1,10 +1,11 @@
 #include "Checkbox.hpp"
 
 Checkbox::Checkbox(std::string const& text, bool checked) {
+    m_type = "Checkbox";
     this->check(checked);
     this->text(text);
     this->setFont("Segoe UI");
-    this->setColor(Style::text());
+    this->color(Style::text());
     this->autoresize();
     this->show();
 }
@@ -33,7 +34,7 @@ void Checkbox::click() {
     m_callback(this);
 }
 
-void Checkbox::setCallback(Callback cb) {
+void Checkbox::callback(Callback cb) {
     m_callback = cb;
 }
 
@@ -42,8 +43,7 @@ bool Checkbox::wantsMouse() const {
 }
 
 HCURSOR Checkbox::cursor() const {
-    static auto hand = LoadCursor(nullptr, IDC_HAND);
-    return hand;
+    return Manager::cursor(IDC_HAND);
 }
 
 void Checkbox::updateSize(HDC hdc, SIZE available) {

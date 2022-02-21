@@ -69,7 +69,7 @@ public:
 
 class SplitLayout;
 
-class Separator : public Widget {
+class ResizeGrip : public Widget {
 public:
     static constexpr const int s_size = 12;
 
@@ -84,7 +84,7 @@ protected:
     friend class SplitLayout;
 
 public:
-    Separator(SplitLayout* layout);
+    ResizeGrip(SplitLayout* layout);
 
     void direct(bool horizontal);
     bool horizontal() const;
@@ -107,9 +107,9 @@ protected:
     int m_split = 0;
     Widget* m_first = nullptr;
     Widget* m_second = nullptr;
-    Separator* m_separator = nullptr;
+    ResizeGrip* m_separator = nullptr;
 
-    friend class Separator;
+    friend class ResizeGrip;
 
 public:
     SplitLayout();

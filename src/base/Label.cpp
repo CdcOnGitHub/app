@@ -2,9 +2,10 @@
 #include "../windows/Window.hpp"
 
 Label::Label(std::string const& text) {
+    m_type = "Label";
     this->text(text);
     this->setFont("Segoe UI");
-    this->setColor(Style::text());
+    this->color(Style::text());
     this->autoresize();
     this->show();
 }

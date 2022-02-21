@@ -15,6 +15,7 @@ protected:
     HINSTANCE m_inst;
     Window* m_mainWindow = nullptr;
     std::unordered_map<std::string, HFONT> m_fonts;
+    std::unordered_map<LPTSTR, HCURSOR> m_cursors;
     std::unordered_set<HMENU> m_menuIDs;
     std::unordered_set<int> m_classIDs;
     Theme::Default m_theme = Theme::Default::Dark;
@@ -47,4 +48,7 @@ public:
     int getDPI(HWND = nullptr);
     float getDPIScale(HWND = nullptr);
     static int scale(int val);
+
+    HCURSOR loadCursor(LPTSTR);
+    static HCURSOR cursor(LPTSTR);
 };

@@ -1,10 +1,11 @@
 #include "Button.hpp"
 
 Button::Button(std::string const& text) {
-    this->setText(text);
+    m_type = "Button";
+    this->text(text);
     this->setFont("Segoe UI");
-    this->setColor(RGB(255, 255, 255));
-    this->setBG(RGB(120, 120, 120));
+    this->color(RGB(255, 255, 255));
+    this->bg(RGB(120, 120, 120));
     this->autoresize();
     this->show();
 }
@@ -13,11 +14,11 @@ void Button::click() {
     m_callback(this);
 }
 
-void Button::setCallback(Callback cb) {
+void Button::callback(Callback cb) {
     m_callback = cb;
 }
 
-void Button::setBG(COLORREF c) {
+void Button::bg(COLORREF c) {
     m_bgColor = c;
     this->update();
 }
@@ -31,8 +32,7 @@ bool Button::wantsMouse() const {
 }
 
 HCURSOR Button::cursor() const {
-    static auto hand = LoadCursor(nullptr, IDC_HAND);
-    return hand;
+    return Manager::cursor(IDC_HAND);
 }
 
 void Button::updateSize(HDC hdc, SIZE available) {

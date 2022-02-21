@@ -29,6 +29,7 @@ protected:
     std::vector<Widget*> m_children;
     std::unordered_map<COLORREF, HBRUSH> m_brushes;
     std::unordered_map<std::string, HPEN> m_pens;
+    const char* m_type = "Widget";
     static Widget* s_hoveredWidget;
     static Widget* s_capturingWidget;
 
@@ -72,6 +73,7 @@ public:
     virtual void mouseup(int x, int y);
     virtual void mousemove(int x, int y);
     virtual bool wantsMouse() const;
+    virtual const char* type() const;
 
     int x() const;
     int y() const;
@@ -90,7 +92,7 @@ protected:
     COLORREF m_color;
 
 public:
-    virtual void setColor(COLORREF color);
+    virtual void color(COLORREF color);
     COLORREF getColor() const;
 };
 

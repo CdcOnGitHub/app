@@ -19,9 +19,9 @@ public:
     bool wantsMouse() const override;
     HCURSOR cursor() const;
 
-    void setBG(COLORREF);
+    void bg(COLORREF);
     COLORREF getBG() const;
 
     void click() override;
-    void setCallback(Callback cb);
+    void callback(Callback cb);
 };
