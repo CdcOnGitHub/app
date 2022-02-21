@@ -31,7 +31,8 @@ void RectWidget::paint(HDC hdc, PAINTSTRUCT* ps) {
             &g, r, m_color, m_cornerRadius / 2, m_cornerRadius
         );
     } else {
-        g.FillRectangle(&SolidBrush(m_color), toRectF(r));
+        SolidBrush brush(m_color);
+        g.FillRectangle(&brush, toRectF(r));
     }
     
     Widget::paint(hdc, ps);

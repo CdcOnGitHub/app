@@ -14,6 +14,16 @@ else()
     set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME GeodeApp32)
 endif()
 
+configure_file(
+    ${CMAKE_SOURCE_DIR}/src/config.hpp.in
+    ${CMAKE_SOURCE_DIR}/src/config.hpp
+)
+
+configure_file(
+    ${CMAKE_SOURCE_DIR}/GeodeApp.exe.manifest.in
+    ${CMAKE_SOURCE_DIR}/GeodeApp.exe.manifest
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC
     src
     src/base

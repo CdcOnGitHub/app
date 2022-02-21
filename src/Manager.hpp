@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <gdiplus.h>
 #include <gdiplusheaders.h>
+#include "config.hpp"
 
 using namespace Gdiplus;
 

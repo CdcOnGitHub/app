@@ -20,10 +20,11 @@ class Tab : public TextWidget {
 public:
     static int s_pad;
     static int s_height;
+    static int s_dot;
 
 protected:
     bool m_selected = false;
-    COLORREF m_dotColor;
+    Color m_dotColor;
 
 public:
     Tab(std::string const& text);
@@ -34,7 +35,7 @@ public:
     bool wantsMouse() const override;
     HCURSOR cursor() const;
 
-    static COLORREF dot();
+    static Color dot();
 
     void click() override;
 };

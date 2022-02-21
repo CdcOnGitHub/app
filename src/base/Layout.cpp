@@ -220,14 +220,15 @@ void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
     auto r = this->rect();
+    SolidBrush brush(Style::separator());
     if (m_horizontal) {
         r.X += r.Width / 2;
         r.Width = 1_px;
-        g.FillRectangle(&SolidBrush(Style::separator()), toRectF(r));
+        g.FillRectangle(&brush, toRectF(r));
     } else {
         r.Y += r.Height / 2;
         r.Height = 1_px;
-        g.FillRectangle(&SolidBrush(Style::separator()), toRectF(r));
+        g.FillRectangle(&brush, toRectF(r));
     }
 }
 

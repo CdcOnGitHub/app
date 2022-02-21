@@ -15,11 +15,14 @@ void Label::updateSize(HDC hdc, SIZE available) {
         Graphics g(hdc);
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
+        Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
         g.MeasureString(
             toWString(m_text).c_str(), -1,
-            &Font(hdc, Manager::get()->loadFont(m_font, m_fontsize)),
-            { 0, 0, 0, 0 }, &r
+            &font, { 0, 0, static_cast<REAL>(available.cx), static_cast<REAL>(available.cy) },
+            &r
         );
+        if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
+        if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
         this->resize(static_cast<int>(r.Width) + 1_px, static_cast<int>(r.Height));
         m_autoresize = true;
     }
@@ -34,12 +37,11 @@ void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
     g.SetSmoothingMode(SmoothingModeAntiAlias);
 
     StringFormat f;
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    SolidBrush brush(m_color);
     g.DrawString(
         toWString(m_text).c_str(), -1,
-        &Font(hdc, Manager::get()->loadFont(m_font, m_fontsize)),
-        toRectF(r),
-        &f,
-        &SolidBrush(m_color)
+        &font, toRectF(r), &f, &brush
     );
     
     Widget::paint(hdc, ps);

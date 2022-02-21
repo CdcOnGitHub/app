@@ -14,6 +14,11 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     auto left = new RectWidget();
     left->color({ 25, 24, 30 });
     auto vleft = new Tabs(new VerticalLayout());
+    auto label = new Label(
+        GEODEAPP_NAME " " GEODEAPP_VERSION "; Built on " __DATE__ " at " __TIME__
+    );
+    label->color({ 100, 255, 255, 255 });
+    vleft->add(label);
     vleft->add(new Tab("General"));
     vleft->add(new Tab("Advanced"));
     vleft->add(new Tab("Tools"));

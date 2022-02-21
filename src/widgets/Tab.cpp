@@ -2,7 +2,8 @@
 #include <array>
 
 int Tab::s_pad = 15_px;
-int Tab::s_height = 40_px;
+int Tab::s_height = 35_px;
+int Tab::s_dot = 12_px;
 
 void Tabs::add(Widget* w) {
     if (w == m_layout) Widget::add(w);
@@ -51,6 +52,7 @@ Tab::Tab(std::string const& text) {
     this->text(text);
     this->color(Style::text());
     this->autoresize();
+    this->fontSize(16_px);
     this->show();
 }
 
@@ -62,17 +64,17 @@ void Tab::updateSize(HDC hdc, SIZE size) {
     }
 }
 
-COLORREF Tab::dot() {
+Color Tab::dot() {
     static int ix = -1;
-    std::array<COLORREF, 8> s = {
-        0x0060BDFF,
-        0x00CA60FF,
-        0x0060FF88,
-        0x00E7FF60,
-        0x00606EFF,
-        0x00FF6E60,
-        0x00A8FF60,
-        0x00FF60A8,
+    std::array<Color, 8> s = {
+        0xFF60BDFF,
+        0xFFCA60FF,
+        0xFF60FF88,
+        0xFFE7FF60,
+        0xFF606EFF,
+        0xFFFF6E60,
+        0xFFA8FF60,
+        0xFFFF60A8,
     };
     ix++;
     if (ix >= s.size()) {
@@ -82,15 +84,13 @@ COLORREF Tab::dot() {
 }
 
 void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
-    auto oldFont = SelectObject(hdc, Manager::get()->loadFont(m_font, m_fontsize));
-
     auto r = this->rect();
     r.X += Tab::s_pad;
     r.Width -= 2 * Tab::s_pad;
 
     auto tr = r;
-    tr.X += Tab::s_height;
-    tr.Width -= Tab::s_height;
+    tr.X += (s_height - Tab::s_dot) / 2 + Tab::s_pad;
+    tr.Width -= (s_height - Tab::s_dot) / 2 + Tab::s_pad;
     if (m_hovered || m_selected) {
         tr.Width -= Tab::s_height;
     }
@@ -103,30 +103,31 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     StringFormat f;
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    SolidBrush brush(m_color);
     gt.DrawString(
         toWString(m_text).c_str(), -1,
-        &Font(hdc, Manager::get()->loadFont(m_font, m_fontsize)),
+        &font,
         RectF {
             static_cast<float>(tr.X),
             static_cast<float>(tr.Y),
             0.f,
             static_cast<float>(tr.Height),
         },
-        &f, &SolidBrush(m_color)
+        &f, &brush
     );
 
     auto g = Graphics(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
+    SolidBrush dotBrush(m_dotColor);
     g.FillEllipse(
-        &SolidBrush(Color(m_dotColor | 0xff000000)),
+        &dotBrush,
         Rect {
             r.X,
-            r.Y + (s_height - 12_px) / 2,
-           12_px, 12_px
+            r.Y + (s_height - Tab::s_dot) / 2,
+           Tab::s_dot, Tab::s_dot
         }
     );
-
-    SelectObject(hdc, oldFont);
 
     Widget::paint(hdc, ps);
 }

@@ -53,11 +53,14 @@ void Checkbox::updateSize(HDC hdc, SIZE available) {
         Graphics g(hdc);
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
+        Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
         g.MeasureString(
             toWString(m_text).c_str(), -1,
-            &Font(hdc, Manager::get()->loadFont(m_font, m_fontsize)),
-            { 0, 0, 0, 0 }, &r
+            &font, { 0, 0, static_cast<REAL>(available.cx), static_cast<REAL>(available.cy) },
+            &r
         );
+        if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
+        if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
         this->resize(static_cast<int>(r.Width) + 40_px, static_cast<int>(r.Height));
         m_autoresize = true;
     }
@@ -97,13 +100,14 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
         auto wt = w / t;
         auto wh = (t - 1) * wt;
         auto d = (r.Height - wh) / 2;
+        Pen pen(Style::text(), 3.0_pxf);
         g.DrawLine(
-            &Pen(Style::text(), 3.0_pxf),
+            &pen,
             cr.X + p, cr.Y + d + (t - 2) * wt,
             cr.X + p + wt, cr.Y + d + wh
         );
         g.DrawLine(
-            &Pen(Style::text(), 3.0_pxf),
+            &pen,
             cr.X + p + wt, cr.Y + d + wh,
             cr.X + p + w, cr.Y + d
         );
@@ -113,11 +117,11 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetAlignment(StringAlignmentNear);
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    SolidBrush brush(m_color);
     g.DrawString(
         toWString(m_text).c_str(), -1,
-        &Font(hdc, Manager::get()->loadFont(m_font, m_fontsize)),
-        toRectF(r),
-        &f, &SolidBrush(m_color)
+        &font, toRectF(r), &f, &brush
     );
 
     Widget::paint(hdc, ps);

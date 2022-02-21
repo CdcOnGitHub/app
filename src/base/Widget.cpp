@@ -220,7 +220,8 @@ void Widget::updateSize(HDC hdc, SIZE size) {
 
 void Widget::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (m_tabbed) {
-        Graphics(hdc).DrawRectangle(&Pen(Style::tab()), toRectF(this->rect()));
+        Pen pen(Style::tab());
+        Graphics(hdc).DrawRectangle(&pen, toRectF(this->rect()));
     }
     for (auto& child : m_children) {
         if (child->m_visible) child->paint(hdc, ps);
