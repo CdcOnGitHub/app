@@ -155,3 +155,170 @@ void VerticalLayout::arrange(SIZE available) {
         pos += child->height() + m_pad;
     }
 }
+
+Separator::Separator(SplitLayout* l) {
+    m_layout = l;
+    this->show();
+}
+
+void Separator::direct(bool horizontal) {
+    m_horizontal = horizontal;
+    this->update();
+}
+
+bool Separator::horizontal() const {
+    return m_horizontal;
+}
+
+int Separator::pos() const {
+    return m_pos + m_moved;
+}
+
+bool Separator::wantsMouse() const {
+    return true;
+}
+
+HCURSOR Separator::cursor() const {
+    if (m_horizontal) {
+        static auto hc = LoadCursor(nullptr, IDC_SIZEWE);
+        return hc;
+    } else {
+        static auto hc = LoadCursor(nullptr, IDC_SIZENS);
+        return hc;
+    }
+}
+
+void Separator::mousedown(int x, int y) {
+    this->captureMouse();
+    m_mousestart = { x, y };
+    m_pos = m_x + s_size;
+    this->update();
+}
+
+void Separator::mouseup(int x, int y) {
+    this->releaseMouse();
+    this->update();
+}
+
+void Separator::mousemove(int x, int y) {
+    if (m_mousedown) {
+        if (m_horizontal) {
+            m_moved = x - m_mousestart.x;
+            m_layout->m_split = m_pos + m_moved;
+        } else {
+            m_moved = y - m_mousestart.y;
+            m_layout->m_split = m_pos + m_moved;
+        }
+        this->update();
+    } else {
+        this->releaseMouse();
+    }
+}
+
+void Separator::paint(HDC hdc, PAINTSTRUCT* ps) {
+    if (!m_paintLine) return;
+    auto r = this->rect();
+    if (m_horizontal) {
+        r.left += (r.right - r.left) / 2;
+        r.right = r.left + 1;
+        FillRect(hdc, &r, this->brush(Style::separator()));
+    } else {
+        r.top += (r.bottom - r.top) / 2;
+        r.bottom = r.top + 1;
+        FillRect(hdc, &r, this->brush(Style::separator()));
+    }
+}
+
+void Separator::hideline() {
+    m_paintLine = false;
+    this->update();
+}
+
+SplitLayout::SplitLayout() {
+    m_separator = new Separator(this);
+    this->add(m_separator);
+    this->show();
+}
+
+void SplitLayout::setDirection(bool h) {
+    m_horizontal = h;
+    m_separator->direct(h);
+    this->update();
+}
+
+void SplitLayout::arrange(SIZE available) {}
+
+void SplitLayout::first(Widget* w) {
+    if (m_first) this->remove(m_first);
+    m_first = w;
+    this->add(w);
+}
+
+void SplitLayout::second(Widget* w) {
+    if (m_second) this->remove(m_second);
+    m_second = w;
+    this->add(w);
+}
+
+Widget* SplitLayout::first() const {
+    return m_first;
+}
+
+Widget* SplitLayout::second() const {
+    return m_second;
+}
+
+void SplitLayout::moveSplit(int split) {
+    m_split = split;
+    this->update();
+}
+
+void SplitLayout::collapseFirst(bool first) {
+    m_collapseFirst = first;
+}
+
+void SplitLayout::hideSeparatorLine() {
+    m_separator->hideline();
+}
+
+void SplitLayout::paint(HDC hdc, PAINTSTRUCT* ps) {
+    m_first->paint(hdc, ps);
+    m_second->paint(hdc, ps);
+    m_separator->paint(hdc, ps);
+}
+
+void SplitLayout::updateSize(HDC hdc, SIZE size) {
+    if (!m_first || !m_second) return;
+    if (!m_split) {
+        m_split = m_horizontal ? size.cx / 2 : size.cy / 2;
+    }
+    auto fsize = size;
+    auto ssize = size;
+    POINT spos;
+    POINT seppos;
+    SIZE sepsize;
+    if (m_horizontal) {
+        fsize.cx = m_split;
+        ssize.cx = size.cx - m_split;
+        spos.x = m_split;
+        spos.y = 0;
+        seppos.x = m_split - Separator::s_size;
+        seppos.y = 0;
+        sepsize.cx = Separator::s_size * 2;
+        sepsize.cy = size.cy;
+    } else {
+        fsize.cy = m_split;
+        ssize.cy = size.cy - m_split;
+        spos.x = 0;
+        spos.y = m_split;
+        seppos.x = 0;
+        seppos.y =  m_split - Separator::s_size;
+        sepsize.cx = size.cx;
+        sepsize.cy = Separator::s_size * 2;
+    }
+    m_first->updateSize(hdc, fsize);
+    m_second->updateSize(hdc, ssize);
+    m_second->move(spos.x, spos.y);
+    m_separator->move(seppos.x, seppos.y);
+    m_separator->resize(sepsize.cx, sepsize.cy);
+}

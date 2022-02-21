@@ -46,4 +46,5 @@ public:
     HINSTANCE getInst() const;
     int getDPI(HWND = nullptr);
     float getDPIScale(HWND = nullptr);
+    static int scale(int val);
 };

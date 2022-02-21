@@ -2,12 +2,21 @@
 
 RectWidget::RectWidget() {
     this->setColor(RGB(255, 255, 255));
+    this->autoresize();
     this->show();
 }
 
 void RectWidget::setCornerRadius(int c) {
     m_cornerRadius = c;
     this->update();
+}
+
+void RectWidget::updateSize(HDC hdc, SIZE available) {
+    Widget::updateSize(hdc, available);
+    if (m_autoresize) {
+        this->resize(available.cx, available.cy);
+        m_autoresize = true;
+    }
 }
 
 void RectWidget::paint(HDC hdc, PAINTSTRUCT* ps) {

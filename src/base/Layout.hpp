@@ -66,3 +66,64 @@ public:
     void remove(Widget* child, bool release = true) override;
     void arrange(SIZE available) override;
 };
+
+class SplitLayout;
+
+class Separator : public Widget {
+public:
+    static constexpr const int s_size = 12;
+
+protected:
+    bool m_horizontal = true;
+    bool m_paintLine = true;
+    int m_pos = 0;
+    int m_moved = 0;
+    POINT m_mousestart;
+    SplitLayout* m_layout;
+
+    friend class SplitLayout;
+
+public:
+    Separator(SplitLayout* layout);
+
+    void direct(bool horizontal);
+    bool horizontal() const;
+    int pos() const;
+
+    bool wantsMouse() const override;
+    HCURSOR cursor() const;
+    void mousedown(int x, int y) override;
+    void mouseup(int x, int y) override;
+    void mousemove(int x, int y) override;
+    void hideline();
+
+    void paint(HDC, PAINTSTRUCT*) override;
+};
+
+class SplitLayout : public Layout {
+protected:
+    bool m_horizontal;
+    bool m_collapseFirst = true;
+    int m_split = 0;
+    Widget* m_first = nullptr;
+    Widget* m_second = nullptr;
+    Separator* m_separator = nullptr;
+
+    friend class Separator;
+
+public:
+    SplitLayout();
+
+    void setDirection(bool horizontal);
+    void arrange(SIZE available) override;
+    void first(Widget* w);
+    void second(Widget* w);
+    Widget* first() const;
+    Widget* second() const;
+    void moveSplit(int split);
+    void collapseFirst(bool first = true);
+    void paint(HDC, PAINTSTRUCT*) override;
+    void hideSeparatorLine();
+
+    void updateSize(HDC, SIZE) override;
+};

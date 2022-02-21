@@ -87,7 +87,7 @@ HFONT Manager::loadFont(std::string const& face, int size) {
     auto faceid = fontFaceID(face, size);
     if (m_fonts.count(faceid)) return m_fonts.at(faceid);
     auto font = CreateFontA(
-        MulDiv(size, Manager::get()->getDPI(), 96),
+        size,
         0, 0, 0, FW_NORMAL, false, false, false, 
         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
         CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
@@ -134,6 +134,10 @@ float Manager::getDPIScale(HWND hwnd) {
     return (m_mainWindow ?
         GetDpiForWindow(m_mainWindow->getHWND()) :
         GetDpiForSystem()) / 96.f;
+}
+
+int Manager::scale(int val) {
+    return MulDiv(val, Manager::get()->getDPI(), 96);
 }
 
 Theme::Default Manager::theme() {

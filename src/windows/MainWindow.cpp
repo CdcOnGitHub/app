@@ -6,62 +6,23 @@
 #include <Layout.hpp>
 #include "TestWindow.hpp"
 
-MainWindow::MainWindow() : Window("Geode App") {
-    auto vlayout = new VerticalLayout();
+MainWindow::MainWindow() : Window("Geode App", 800, 600) {
+    auto layout = new SplitLayout();
+    layout->hideSeparatorLine();
 
+    auto left = new RectWidget();
+    left->setColor(RGB(25, 24, 30));
+    layout->first(left);
 
-    auto layout = new HorizontalLayout();
-    layout->pad(5);
+    auto right = new VerticalLayout();
+    
+    for (int i = 0; i < 3; i++) {
+        right->add(new Label("my girlfriend has " + std::to_string(i) + " bones in her body"));
+    }
 
-    auto btn = new Button("Open");
-    btn->setCallback([](auto) -> void {
-        auto win = new TestWindow();
-        win->show();
-    });
-    layout->add(btn);
+    layout->second(right);
 
-    auto themeLabel = new Label("You need to restart the app to apply this theme.");
-    themeLabel->hide();
-    layout->add(themeLabel, HorizontalLayout::End);
+    layout->moveSplit(250);
 
-    auto cb = new Checkbox("Light Theme", Style::id() == "light");
-    cb->setCallback([this, themeLabel](auto c) -> void {
-        Manager::get()->setTheme(c->checked() ? Theme::Default::Light : Theme::Default::Dark);
-        themeLabel->show();
-    });
-    layout->add(cb, HorizontalLayout::Middle);
-
-    vlayout->add(layout);
-
-
-    vlayout->add(new Pad(true));
-
-
-    auto layout2 = new HorizontalLayout();
-
-    auto text1 = new Label("automatic");
-    layout2->add(text1);
-
-    layout2->add(new Pad(true));
-    layout2->add(new Pad(true));
-
-    auto text2 = new Label("padding");
-    layout2->add(text2);
-
-    vlayout->add(layout2);
-
-
-    vlayout->add(new Pad(true));
-
-
-    auto bottomLayout = new HorizontalLayout();
-
-    bottomLayout->add(new Pad(true));
-    auto bottomText = new Label("bottom text");
-    bottomLayout->add(bottomText);
-    bottomLayout->add(new Pad(true));
-
-    vlayout->add(bottomLayout);
-
-    this->add(vlayout);
+    this->add(layout);
 }

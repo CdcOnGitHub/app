@@ -4,6 +4,7 @@
 #include <Windows.h>
 
 std::ostream& operator<<(std::ostream&, RECT);
+std::ostream& operator<<(std::ostream&, SIZE);
 std::ostream& operator<<(std::ostream&, POINT);
 
 namespace color_utils {

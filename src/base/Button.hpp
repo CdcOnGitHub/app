@@ -12,15 +12,11 @@ protected:
 
 public:
     Button(std::string const& text);
-    virtual ~Button();
 
     void updateSize(HDC hdc, SIZE) override;
     void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
     bool wantsMouse() const override;
-
-    void enter() override;
-    void leave() override;
     HCURSOR cursor() const;
 
     void setBG(COLORREF);

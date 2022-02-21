@@ -30,6 +30,7 @@ protected:
     std::unordered_map<COLORREF, HBRUSH> m_brushes;
     std::unordered_map<std::string, HPEN> m_pens;
     static Widget* s_hoveredWidget;
+    static Widget* s_capturingWidget;
 
     void updatePosition();
     void setWindow(Window*);
@@ -37,6 +38,8 @@ protected:
     void propagateMouseEvent(POINT& p, bool down);
     bool propagateTabEvent(int& index, int target);
     bool propagateCaptureMouse(POINT& p);
+    void captureMouse();
+    void releaseMouse();
 
     HBRUSH brush(COLORREF);
     HPEN pen(COLORREF color, int size = 1, int style = PS_SOLID);
@@ -98,7 +101,7 @@ protected:
     int m_fontsize = 20;
 
 public:
-    virtual void setText(std::string const& text);
+    virtual void text(std::string const& text);
     std::string getText() const;
 
     void setFont(std::string const& font);

@@ -10,5 +10,6 @@ public:
     RectWidget();
 
     void setCornerRadius(int c);
+    void updateSize(HDC, SIZE) override;
     void paint(HDC, PAINTSTRUCT*) override;
 };

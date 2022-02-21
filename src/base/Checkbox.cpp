@@ -2,14 +2,11 @@
 
 Checkbox::Checkbox(std::string const& text, bool checked) {
     this->check(checked);
-    this->setText(text);
+    this->text(text);
     this->setFont("Segoe UI");
     this->setColor(Style::text());
     this->autoresize();
     this->show();
-}
-
-Checkbox::~Checkbox() {
 }
 
 void Checkbox::check(bool check) {
@@ -38,14 +35,6 @@ void Checkbox::click() {
 
 void Checkbox::setCallback(Callback cb) {
     m_callback = cb;
-}
-
-void Checkbox::enter() {
-    this->update();
-}
-
-void Checkbox::leave() {
-    this->update();
 }
 
 bool Checkbox::wantsMouse() const {

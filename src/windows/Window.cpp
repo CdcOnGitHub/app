@@ -67,8 +67,7 @@ Window::Window(std::string const& title, int width, int height) {
         title.c_str(),
         WS_OVERLAPPEDWINDOW | WS_EX_LAYERED,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        MulDiv(width, Manager::get()->getDPI(), 96),
-        MulDiv(height, Manager::get()->getDPI(), 96),
+        width, height,
         nullptr,
         nullptr,
         Manager::get()->getInst(),
@@ -129,7 +128,7 @@ HWND Window::getHWND() const {
 }
 
 void Window::updateWindow(RECT rc) {
-    InvalidateRect(m_hwnd, &rc, true);
+    InvalidateRect(m_hwnd, &rc, false);
 }
 
 void Window::updateWindow() {
@@ -178,6 +177,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.x = GET_X_LPARAM(lp);
             p.y = GET_Y_LPARAM(lp);
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
+            if (Widget::s_capturingWidget) return hit;
             if (this->propagateCaptureMouse(p)) return hit;
             Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
             
@@ -200,7 +200,12 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.x = GET_X_LPARAM(lp);
             p.y = GET_Y_LPARAM(lp);
             m_mousedown = true;
-            this->propagateMouseEvent(p, true);
+            if (Widget::s_capturingWidget) {
+                Widget::s_capturingWidget->m_mousedown = true;
+                Widget::s_capturingWidget->mousedown(p.x, p.y);
+            } else {
+                this->propagateMouseEvent(p, true);
+            }
         } break;
 
         case WM_LBUTTONUP: {
@@ -208,7 +213,12 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.x = GET_X_LPARAM(lp);
             p.y = GET_Y_LPARAM(lp);
             m_mousedown = false;
-            this->propagateMouseEvent(p, false);
+            if (Widget::s_capturingWidget) {
+                Widget::s_capturingWidget->m_mousedown = false;
+                Widget::s_capturingWidget->mouseup(p.x, p.y);
+            } else {
+                this->propagateMouseEvent(p, false);
+            }
         } break;
 
         case WM_MOUSEMOVE: {
@@ -216,7 +226,13 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             p.x = GET_X_LPARAM(lp);
             p.y = GET_Y_LPARAM(lp);
             m_mousedown = wp & MK_LBUTTON;
-            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, wp & MK_LBUTTON);
+            if (Widget::s_capturingWidget) {
+                Widget::s_hoveredWidget = Widget::s_capturingWidget;
+                Widget::s_capturingWidget->m_mousedown = m_mousedown;
+                Widget::s_capturingWidget->mousemove(p.x, p.y);
+            } else {
+                Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
+            }
         } break;
 
         case WM_SETCURSOR: {

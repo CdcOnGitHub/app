@@ -12,15 +12,11 @@ protected:
 
 public:
     Checkbox(std::string const& text, bool checked = false);
-    virtual ~Checkbox();
 
     void updateSize(HDC hdc, SIZE available) override;
     void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
     bool wantsMouse() const override;
-
-    void enter() override;
-    void leave() override;
     HCURSOR cursor() const;
 
     void check(bool check = true);

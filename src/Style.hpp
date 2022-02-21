@@ -13,6 +13,7 @@ struct Theme {
     COLORREF m_primary;
     COLORREF m_secondary;
     COLORREF m_tab;
+    COLORREF m_separator;
 
     enum class Default {
         Light, Dark,
@@ -35,6 +36,7 @@ public:
     DEF_THEME_GETTER(primary);
     DEF_THEME_GETTER(secondary);
     DEF_THEME_GETTER(tab);
+    DEF_THEME_GETTER(separator);
 
     static Style* current();
     void load(Theme const& theme);

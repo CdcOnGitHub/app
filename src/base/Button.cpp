@@ -9,9 +9,6 @@ Button::Button(std::string const& text) {
     this->show();
 }
 
-Button::~Button() {
-}
-
 void Button::click() {
     m_callback(this);
 }
@@ -27,14 +24,6 @@ void Button::setBG(COLORREF c) {
 
 COLORREF Button::getBG() const {
     return m_bgColor;
-}
-
-void Button::enter() {
-    this->update();
-}
-
-void Button::leave() {
-    this->update();
 }
 
 bool Button::wantsMouse() const {

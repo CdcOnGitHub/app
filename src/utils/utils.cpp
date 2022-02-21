@@ -12,6 +12,10 @@ std::ostream& operator<<(std::ostream& stream, POINT p) {
     return stream << "x: " << p.x << ", y: " << p.y;
 }
 
+std::ostream& operator<<(std::ostream& stream, SIZE p) {
+    return stream << "cx: " << p.cx << ", cy: " << p.cy;
+}
+
 COLORREF color_utils::darken(COLORREF color, int darken) {
     return RGB(GetRValue(color) - darken, GetGValue(color) - darken, GetBValue(color) - darken);
 }

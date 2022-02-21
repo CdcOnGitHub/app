@@ -2,6 +2,19 @@
 #include <Window.hpp>
 
 Widget* Widget::s_hoveredWidget = nullptr;
+Widget* Widget::s_capturingWidget = nullptr;
+
+void Widget::captureMouse() {
+    if (!s_capturingWidget) {
+        s_capturingWidget = this;
+    }
+}
+
+void Widget::releaseMouse() {
+    if (s_capturingWidget == this) {
+        s_capturingWidget = nullptr;
+    }
+}
 
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
@@ -85,8 +98,12 @@ void Widget::hide() {
     this->update();
 }
 
-void Widget::enter() {}
-void Widget::leave() {}
+void Widget::enter() {
+    this->update();
+}
+void Widget::leave() {
+    this->update();
+}
 void Widget::click() {}
 void Widget::mousemove(int x, int y) {}
 void Widget::mousedown(int x, int y) {}
@@ -265,7 +282,7 @@ COLORREF ColorWidget::getColor() const {
     return m_color;
 }
 
-void TextWidget::setText(std::string const& text) {
+void TextWidget::text(std::string const& text) {
     this->m_text = text;
 }
 
