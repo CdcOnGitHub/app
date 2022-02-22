@@ -20,8 +20,11 @@ std::wstring toWString(std::string const& str);
 RectF toRectF(Rect const& r);
 RECT toRECT(Rect const& r);
 Point toPoint(POINT const& p);
+PointF toPointF(Rect const& p);
 
-namespace color_utils {
+namespace color {
     Color darken(Color const& color, BYTE darken);
     Color lighten(Color const& color, BYTE lighten);
+    Color alpha(Color const& color, BYTE newAlpha);
+    Color alpha(Color const& color, int newAlpha);
 }

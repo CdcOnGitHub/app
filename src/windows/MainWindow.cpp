@@ -12,16 +12,17 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     layout->hideSeparatorLine();
 
     auto left = new RectWidget();
-    left->color({ 25, 24, 30 });
+    left->color(Style::sidebar());
     auto vleft = new Tabs(new VerticalLayout());
     auto label = new Label(
         GEODEAPP_NAME " " GEODEAPP_VERSION "; Built on " __DATE__ " at " __TIME__
     );
-    label->color({ 100, 255, 255, 255 });
+    label->wrap(false);
+    label->color(color::alpha(Style::text(), 100));
     vleft->add(label);
-    vleft->add(new Tab("General"));
-    vleft->add(new Tab("Advanced"));
-    vleft->add(new Tab("Tools"));
+    vleft->add(new Tab("General", Tab::Diamond));
+    vleft->add(new Tab("Advanced", Tab::Diamond));
+    vleft->add(new Tab("Tools", Tab::Diamond));
     vleft->add(new TabSeparator());
     vleft->add(new Tab("Vanilla"));
     vleft->add(new Tab("Gay sex"));
@@ -29,7 +30,7 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     vleft->add(new Tab("Femboy Hooters"));
     vleft->add(new Tab("Catgirls"));
     vleft->add(new Pad(true));
-    vleft->add(new Tab("Settings"));
+    vleft->add(new Tab("Settings", Tab::Diamond));
     left->add(vleft);
     layout->first(left);
 
@@ -43,7 +44,7 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     });
     btn->bg(Style::primary());
     right->add(btn);
-    auto cbox = new Checkbox("Test");
+    auto cbox = new Checkbox("Test Checkbox Thing");
     right->add(cbox);
     layout->second(right);
 

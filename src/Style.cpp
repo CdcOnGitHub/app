@@ -22,21 +22,27 @@ void Style::load(Theme::Default theme) {
 Theme g_light = {
     "light",
     Color(255, 255, 255),
+    Color(200, 200, 200),
     Color(0, 0, 0),
     Color(111, 125, 170),
     Color(170, 111, 152),
     Color(55, 55, 80),
-    Color(55, 55, 55),
+    Color(25, 0, 0, 0),
+    Color(55, 0, 0, 0),
+    Color(255, 255, 255),
 };
 
 Theme g_dark = {
     "dark",
-    Color(0x26, 0x24, 0x2d),
+    Color(38, 36, 45),
+    Color(25, 24, 30),
     Color(255, 255, 255),
     Color(111, 125, 170),
     Color(170, 111, 152),
     Color(255, 255, 180),
-    Color(100, 100, 100),
+    Color(25, 255, 255, 255),
+    Color(55, 255, 255, 255),
+    Color(38, 36, 45),
 };
 
 Theme& Theme::get(Theme::Default d) {

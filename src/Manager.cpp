@@ -37,8 +37,8 @@ Manager* Manager::get() {
 void Manager::run(Window* window) {
     m_mainWindow = window;
     MSG msg;
-    auto st = Gdiplus::GdiplusStartup(&m_gdiToken, &m_gdiStartupInput, nullptr);
-    if (st != Gdiplus::Ok) {
+    auto st = GdiplusStartup(&m_gdiToken, &m_gdiStartupInput, nullptr);
+    if (st != Status::Ok) {
         auto err = "Unable to initialize Gdiplus! "
         "App may look disfigured or unusuable "
         "(Status Code " + std::to_string(st) + ")";
@@ -50,7 +50,7 @@ void Manager::run(Window* window) {
         DispatchMessage(&msg);
     }
     BufferedPaintUnInit();
-    Gdiplus::GdiplusShutdown(m_gdiToken);
+    GdiplusShutdown(m_gdiToken);
     this->save();
 }
 

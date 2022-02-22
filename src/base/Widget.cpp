@@ -286,3 +286,7 @@ void TextWidget::font(std::string const& font) {
 void TextWidget::fontSize(int size) {
     this->font(m_font, size);
 }
+
+void TextWidget::wrap(bool on) {
+    m_wordwrap = on;
+}

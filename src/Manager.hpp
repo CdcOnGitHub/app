@@ -7,11 +7,7 @@
 #include <unordered_set>
 #include <Style.hpp>
 #include <filesystem>
-#include <gdiplus.h>
-#include <gdiplusheaders.h>
 #include "config.hpp"
-
-using namespace Gdiplus;
 
 class Window;
 

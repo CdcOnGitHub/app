@@ -1,4 +1,5 @@
 #include "Checkbox.hpp"
+#include "Button.hpp"
 
 Checkbox::Checkbox(std::string const& text, bool checked) {
     m_type = "Checkbox";
@@ -72,12 +73,12 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
 
     Rect cr;
     cr.X = r.X;
-    cr.Y = r.Y;
-    cr.Width = r.Height;
-    cr.Height = r.Height;
+    cr.Y = r.Y + (r.Height - m_fontsize) / 2;
+    cr.Width = m_fontsize;
+    cr.Height = m_fontsize;
 
-    r.X += 40_px;
-    r.Width -= 40_px;
+    r.X += m_fontsize + 5_px;
+    r.Width -= m_fontsize - 5_px;
 
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
@@ -85,32 +86,32 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto color = m_checked ? Style::primary() : Style::secondary();
     FillRoundRect(&g, cr, 
         m_mousedown ?
-            color_utils::darken(color, 50) :
+            color::darken(color, 50) :
         (m_hovered ?
-            color_utils::lighten(color, 50) :
+            color::lighten(color, 50) :
             color
         ),
-        5_px, 10_px
+        Button::s_rounding, Button::s_rounding * 2
     );
 
     if (m_checked) {
         constexpr const auto p = 5;
         constexpr const auto t = 3;
-        auto w = r.Height - 2 * p;
+        auto w = cr.Height - 2 * p;
         auto wt = w / t;
         auto wh = (t - 1) * wt;
-        auto d = (r.Height - wh) / 2;
-        Pen pen(Style::text(), 3.0_pxf);
-        g.DrawLine(
-            &pen,
+        auto d = (cr.Height - wh) / 2;
+        Pen pen(Style::text(), m_fontsize / 7.f);
+        GraphicsPath path;
+        path.AddLine(
             cr.X + p, cr.Y + d + (t - 2) * wt,
             cr.X + p + wt, cr.Y + d + wh
         );
-        g.DrawLine(
-            &pen,
+        path.AddLine(
             cr.X + p + wt, cr.Y + d + wh,
             cr.X + p + w, cr.Y + d
         );
+        g.DrawPath(&pen, &path);
     }
     
     StringFormat f;

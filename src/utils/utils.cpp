@@ -185,7 +185,14 @@ Point toPoint(POINT const& p) {
     return { p.x, p.y };
 }
 
-Color color_utils::darken(Color const& color, BYTE darken) {
+PointF toPointF(Rect const& p) {
+    return {
+        static_cast<REAL>(p.X),
+        static_cast<REAL>(p.Y)
+    };
+}
+
+Color color::darken(Color const& color, BYTE darken) {
     return {
         color.GetA(),
         static_cast<BYTE>(color.GetR() - darken),
@@ -194,6 +201,20 @@ Color color_utils::darken(Color const& color, BYTE darken) {
     };
 }
 
-Color color_utils::lighten(Color const& color, BYTE lighten) {
+Color color::lighten(Color const& color, BYTE lighten) {
     return darken(color, -lighten);
 }
+
+Color color::alpha(Color const& color, BYTE newAlpha) {
+    return {
+        newAlpha,
+        color.GetR(),
+        color.GetG(),
+        color.GetB()
+    };
+}
+
+Color color::alpha(Color const& color, int newAlpha) {
+    return color::alpha(color, static_cast<BYTE>(newAlpha));
+}
+

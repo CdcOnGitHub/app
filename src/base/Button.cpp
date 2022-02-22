@@ -1,5 +1,7 @@
 #include "Button.hpp"
 
+int Button::s_rounding = 2_px;
+
 Button::Button(std::string const& text) {
     m_type = "Button";
     this->text(text);
@@ -48,7 +50,7 @@ void Button::updateSize(HDC hdc, SIZE available) {
         );
         if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
         if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
-        this->resize(static_cast<int>(r.Width) + 40_px, static_cast<int>(r.Height) + 15_px);
+        this->resize(static_cast<int>(r.Width) + 30_px, static_cast<int>(r.Height) + 10_px);
         m_autoresize = true;
     }
     Widget::updateSize(hdc, available);
@@ -62,12 +64,12 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
 
     FillRoundRect(&g, r, 
         m_mousedown ?
-            color_utils::darken(m_bgColor, 50) :
+            color::darken(m_bgColor, 50) :
         (m_hovered ?
-            color_utils::lighten(m_bgColor, 50) :
+            color::lighten(m_bgColor, 50) :
             m_bgColor
         ),
-        5_px, 10_px
+        s_rounding, s_rounding * 2
     );
 
     StringFormat f;

@@ -98,6 +98,7 @@ protected:
     std::string m_text;
     std::string m_font;
     int m_fontsize = 20_px;
+    bool m_wordwrap = true;
 
 public:
     virtual void text(std::string const& text);
@@ -106,4 +107,5 @@ public:
     void font(std::string const& font);
     virtual void font(std::string const& font, int size);
     virtual void fontSize(int size = 20);
+    void wrap(bool);
 };

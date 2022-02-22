@@ -14,6 +14,7 @@ public:
     Tabs(Layout* l);
 
     void add(Widget* w) override;
+    void select(Tab* tab);
 };
 
 class Tab : public TextWidget {
@@ -21,13 +22,23 @@ public:
     static int s_pad;
     static int s_height;
     static int s_dot;
+    static int s_arrow;
+    
+    enum Type {
+        Diamond,
+        Dot,
+    };
 
 protected:
     bool m_selected = false;
     Color m_dotColor;
+    Type m_type;
+    Tabs* m_control = nullptr;
+
+    friend class Tabs;
 
 public:
-    Tab(std::string const& text);
+    Tab(std::string const& text, Type type = Type::Dot);
 
     void updateSize(HDC hdc, SIZE) override;
     void paint(HDC hdc, PAINTSTRUCT* ps) override;

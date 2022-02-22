@@ -16,11 +16,23 @@ void Label::updateSize(HDC hdc, SIZE available) {
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
         Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
-        g.MeasureString(
-            toWString(m_text).c_str(), -1,
-            &font, { 0, 0, static_cast<REAL>(available.cx), static_cast<REAL>(available.cy) },
-            &r
-        );
+        if (m_wordwrap) {
+            g.MeasureString(
+                toWString(m_text).c_str(), -1,
+                &font, { 
+                    0, 0,
+                    static_cast<REAL>(available.cx),
+                    static_cast<REAL>(available.cy)
+                }, &r
+            );
+        } else {
+            g.MeasureString(
+                toWString(m_text).c_str(), -1,
+                &font, { 
+                    0, 0, 0, 0
+                }, &r
+            );
+        }
         if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
         if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
         this->resize(static_cast<int>(r.Width) + 1_px, static_cast<int>(r.Height));
@@ -39,10 +51,19 @@ void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
     StringFormat f;
     Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
     SolidBrush brush(m_color);
-    g.DrawString(
-        toWString(m_text).c_str(), -1,
-        &font, toRectF(r), &f, &brush
-    );
+    if (m_wordwrap) {
+        g.DrawString(
+            toWString(m_text).c_str(), -1,
+            &font, toRectF(r), &f, &brush
+        );
+    } else {
+        Region reg(r);
+        g.SetClip(&reg);
+        g.DrawString(
+            toWString(m_text).c_str(), -1,
+            &font, toPointF(r), &f, &brush
+        );
+    }
     
     Widget::paint(hdc, ps);
 }
