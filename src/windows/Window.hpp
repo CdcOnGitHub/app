@@ -22,8 +22,7 @@ public:
     void updateWindow(RECT rc);
     void updateWindow();
     void paint(HDC, PAINTSTRUCT*) override;
-    void show() override;
-    void hide() override;
+    void show(bool v = true) override;
     void move(int x, int y) override;
 
     static void updateAll();

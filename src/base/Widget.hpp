@@ -20,6 +20,7 @@ protected:
     int m_width = 0;
     int m_height = 0;
     bool m_autoresize = false;
+    bool m_resizeHandled = false;
     bool m_visible = false;
     bool m_hovered = false;
     bool m_mousedown = false;
@@ -35,8 +36,7 @@ protected:
 
     void updatePosition();
     void setWindow(Window*);
-    Widget* propagateMouseMoveEvent(Point& p, bool down);
-    void propagateMouseEvent(Point& p, bool down);
+    Widget* propagateMouseEvent(Point& p, bool down, int clickCount);
     bool propagateTabEvent(int& index, int target);
     bool propagateCaptureMouse(Point& p);
     void captureMouse();
@@ -58,8 +58,8 @@ public:
     virtual void resize(int width, int height);
     virtual void autoresize();
     virtual void move(int x, int y);
-    virtual void show();
-    virtual void hide();
+    virtual void show(bool v = true);
+    void hide();
     virtual void update();
     virtual void enter();
     virtual void leave();
@@ -67,6 +67,7 @@ public:
     void tableave();
     virtual void click();
     virtual void mousedown(int x, int y);
+    virtual void mousedoubleclick(int x, int y);
     virtual void mouseup(int x, int y);
     virtual void mousemove(int x, int y);
     virtual bool wantsMouse() const;
@@ -82,6 +83,7 @@ public:
 
     Point offset() const;
     Rect rect() const;
+    Size size() const;
 };
 
 class ColorWidget : public Widget {

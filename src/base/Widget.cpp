@@ -70,6 +70,10 @@ Rect Widget::rect() const {
     return r;
 }
 
+Size Widget::size() const {
+    return { m_width, m_height };
+}
+
 void Widget::updatePosition() {
     this->move(m_x, m_y);
 }
@@ -92,14 +96,13 @@ void Widget::autoresize() {
     m_autoresize = true;
 }
 
-void Widget::show() {
-    m_visible = true;
+void Widget::show(bool v) {
+    m_visible = v;
     this->update();
 }
 
 void Widget::hide() {
-    m_visible = false;
-    this->update();
+    this->show(false);
 }
 
 void Widget::enter() {
@@ -109,6 +112,7 @@ void Widget::leave() {
     this->update();
 }
 void Widget::click() {}
+void Widget::mousedoubleclick(int x, int y) {}
 void Widget::mousemove(int x, int y) {}
 void Widget::mousedown(int x, int y) {}
 void Widget::mouseup(int x, int y) {
@@ -155,44 +159,44 @@ bool Widget::propagateTabEvent(int& index, int target) {
     return false;
 }
 
-void Widget::propagateMouseEvent(Point& p, bool down) {
-    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
-        auto child = *it;
-        if (child->wantsMouse()) {
-            auto r = child->rect();
-            if (r.Contains(p)) {
-                if (down) {
-                    child->m_mousedown = true;
-                    child->mousedown(p.X, p.Y);
-                    child->update();
-                } else {
-                    child->m_mousedown = false;
-                    child->mouseup(p.X, p.Y);
-                    child->update();
-                }
-            }
-        }
-    }
-    for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
-        (*it)->propagateMouseEvent(p, down);
-    }
-}
-
-Widget* Widget::propagateMouseMoveEvent(Point& p, bool down) {
+Widget* Widget::propagateMouseEvent(Point& p, bool down, int clickCount) {
     Widget* ret = nullptr;
     for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
         auto child = *it;
         if (child->wantsMouse()) {
             auto r = child->rect();
             if (r.Contains(p)) {
-                if (!child->m_hovered) {
-                    child->m_hovered = true;
-                    child->m_mousedown = down;
-                    child->enter();
-                }
                 ret = child;
-                child->mousemove(p.X, p.Y);
-            } else {
+                switch (clickCount) {
+                    case 0: {
+                        if (!child->m_hovered) {
+                            child->m_hovered = true;
+                            child->m_mousedown = down;
+                            child->enter();
+                        }
+                        child->mousemove(p.X, p.Y);
+                    } break;
+
+                    case 1: {
+                        if (down) {
+                            child->m_mousedown = true;
+                            child->mousedown(p.X, p.Y);
+                            child->update();
+                        } else {
+                            child->m_mousedown = false;
+                            child->mouseup(p.X, p.Y);
+                            child->update();
+                        }
+                    } break;
+
+                    default: {
+                        child->m_mousedown = true;
+                        child->mousedown(p.X, p.Y);
+                        child->mousedoubleclick(p.X, p.Y);
+                        child->update();
+                    } break;
+                }
+            } else if (clickCount == 0) {
                 if (child->m_hovered) {
                     child->m_hovered = false;
                     child->m_mousedown = false;
@@ -202,7 +206,7 @@ Widget* Widget::propagateMouseMoveEvent(Point& p, bool down) {
         }
     }
     for (auto& it = m_children.rbegin(); it != m_children.rend(); it++) {
-        auto r = (*it)->propagateMouseMoveEvent(p, down);
+        auto r = (*it)->propagateMouseEvent(p, down, clickCount);
         if (r) ret = r;
     }
     return ret;
@@ -212,9 +216,23 @@ void Widget::update() {
     if (m_window) m_window->updateWindow();
 }
 
-void Widget::updateSize(HDC hdc, SIZE size) {
-    for (auto& child : m_children) {
-        if (child->m_visible) child->updateSize(hdc, size);
+void Widget::updateSize(HDC hdc, SIZE available) {
+    if (m_autoresize) {
+        SIZE to = (m_resizeHandled ? SIZE { m_width, m_height } : SIZE { 0, 0 });
+        for (auto& child : m_children) {
+            if (child->m_visible) {
+                child->updateSize(hdc, available);
+                auto childsupport = child->offset() + child->size();
+                if (childsupport.X > to.cx) to.cx = childsupport.X;
+                if (childsupport.Y > to.cy) to.cy = childsupport.Y;
+            }
+        }
+        this->resize(to.cx, to.cy);
+        m_autoresize = true;
+    } else {
+        for (auto& child : m_children) {
+            if (child->m_visible) child->updateSize(hdc, available);
+        }
     }
 }
 

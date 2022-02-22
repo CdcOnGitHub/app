@@ -38,7 +38,7 @@ void Label::updateSize(HDC hdc, SIZE available) {
         this->resize(static_cast<int>(r.Width) + 1_px, static_cast<int>(r.Height));
         m_autoresize = true;
     }
-
+    m_resizeHandled = true;
     Widget::updateSize(hdc, available);
 }
 

@@ -14,12 +14,13 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     auto left = new RectWidget();
     left->color(Style::sidebar());
     auto vleft = new Tabs(new VerticalLayout());
+    auto labelPad = new PadWidget(Tab::s_pad);
     auto label = new Label(
-        GEODEAPP_NAME " " GEODEAPP_VERSION "; Built on " __DATE__ " at " __TIME__
+        GEODEAPP_NAME " " GEODEAPP_VERSION
     );
     label->wrap(false);
-    label->color(color::alpha(Style::text(), 100));
-    vleft->add(label);
+    labelPad->add(label);
+    vleft->add(labelPad);
     vleft->add(new Tab("General", Tab::Diamond));
     vleft->add(new Tab("Advanced", Tab::Diamond));
     vleft->add(new Tab("Tools", Tab::Diamond));
@@ -48,6 +49,8 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     right->add(cbox);
     layout->second(right);
 
+    layout->min(Tab::s_pad * 2 + Tab::s_dot);
+    layout->max(400_px);
     layout->moveSplit(250_px);
 
     this->add(layout);

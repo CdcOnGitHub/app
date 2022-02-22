@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Widget.hpp"
+#undef min
+#undef max
 
 class Pad : public Widget {
 protected:
@@ -14,6 +16,23 @@ public:
     void resize(int size);
     void expand(bool exp = true);
     bool doesExpand() const;
+};
+
+class PadWidget : public Widget {
+protected:
+    int m_pad = 0;
+    Widget* m_widget = nullptr;
+
+public:
+    PadWidget(int size, Widget* widget);
+    PadWidget(int size);
+    PadWidget();
+
+    void pad(int size);
+    int pad() const;
+
+    void updateSize(HDC, SIZE) override;
+    void add(Widget* child) override;
 };
 
 class Layout : public Widget {
@@ -95,6 +114,7 @@ public:
     void mousedown(int x, int y) override;
     void mouseup(int x, int y) override;
     void mousemove(int x, int y) override;
+    void mousedoubleclick(int x, int y) override;
     void hideline();
 
     void paint(HDC, PAINTSTRUCT*) override;
@@ -104,7 +124,10 @@ class SplitLayout : public Layout {
 protected:
     bool m_horizontal = true;
     bool m_collapseFirst = true;
+    bool m_collapsed = false;
     int m_split = 0;
+    int m_min = 0;
+    int m_max = 0;
     Widget* m_first = nullptr;
     Widget* m_second = nullptr;
     ResizeGrip* m_separator = nullptr;
@@ -124,6 +147,10 @@ public:
     void collapseFirst(bool first = true);
     void paint(HDC, PAINTSTRUCT*) override;
     void hideSeparatorLine();
+    void min(int m);
+    void max(int m);
+    void collapse();
+    void grow();
 
     void updateSize(HDC, SIZE) override;
 };

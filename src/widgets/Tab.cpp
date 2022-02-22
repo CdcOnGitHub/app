@@ -164,7 +164,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
             powf(static_cast<float>(Tab::s_dot), 2) * 2.f)
         );
         PointF center(
-            r.X + dh / 2.f,
+            r.X + Tab::s_dot / 2.f,
             r.Y + (s_height - dh) / 2.f
         );
         g.TranslateTransform(center.X, center.Y);
@@ -187,7 +187,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
         );
     }
 
-    if (m_hovered || m_selected) {
+    if ((m_hovered || m_selected) && m_width > s_pad * 2 + s_dot + s_arrow * 2) {
         Pen pen(Style::text(), m_fontsize / 8.f);
         GraphicsPath path;
         auto pad = (s_height - s_arrow) / 2;

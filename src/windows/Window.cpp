@@ -45,7 +45,7 @@ Window::Window(std::string const& title, int width, int height) {
     auto className = "GeodeAppWindow" + std::to_string(m_classID);
 
     wcex.cbSize         = sizeof(WNDCLASSEXA);
-    wcex.style          = CS_HREDRAW | CS_VREDRAW;
+    wcex.style          = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wcex.lpfnWndProc    = Window::WndProc;
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
@@ -102,14 +102,9 @@ Window::~Window() {
     }
 }
 
-void Window::show() {
-    Widget::show();
-    ShowWindow(m_hwnd, SW_SHOW);
-}
-
-void Window::hide() {
-    Widget::hide();
-    ShowWindow(m_hwnd, SW_HIDE);
+void Window::show(bool v) {
+    Widget::show(v);
+    ShowWindow(m_hwnd, v ? SW_SHOW : SW_HIDE);
 }
 
 void Window::move(int x, int y) {
@@ -179,7 +174,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
             if (Widget::s_capturingWidget) return hit;
             if (this->propagateCaptureMouse(toPoint(p))) return hit;
-            Widget::s_hoveredWidget = this->propagateMouseMoveEvent(toPoint(p), m_mousedown);
+            Widget::s_hoveredWidget = this->propagateMouseEvent(toPoint(p), m_mousedown, 0);
             
             if (hit == HTCLIENT) hit = HTCAPTION;
             
@@ -207,7 +202,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 Widget::s_capturingWidget->m_mousedown = true;
                 Widget::s_capturingWidget->mousedown(p.X, p.Y);
             } else {
-                this->propagateMouseEvent(p, true);
+                this->propagateMouseEvent(p, true, 1);
             }
         } break;
 
@@ -218,7 +213,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 Widget::s_capturingWidget->m_mousedown = false;
                 Widget::s_capturingWidget->mouseup(p.X, p.Y);
             } else {
-                this->propagateMouseEvent(p, false);
+                this->propagateMouseEvent(p, false, 1);
             }
         } break;
 
@@ -230,7 +225,19 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 Widget::s_capturingWidget->m_mousedown = m_mousedown;
                 Widget::s_capturingWidget->mousemove(p.X, p.Y);
             } else {
-                Widget::s_hoveredWidget = this->propagateMouseMoveEvent(p, m_mousedown);
+                Widget::s_hoveredWidget = this->propagateMouseEvent(p, m_mousedown, 0);
+            }
+        } break;
+
+        case WM_LBUTTONDBLCLK: {
+            Point p(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
+            m_mousedown = true;
+            if (Widget::s_capturingWidget) {
+                Widget::s_capturingWidget->m_mousedown = true;
+                Widget::s_capturingWidget->mousedown(p.X, p.Y);
+                Widget::s_capturingWidget->mousedoubleclick(p.X, p.Y);
+            } else {
+                this->propagateMouseEvent(p, true, 2);
             }
         } break;
 

@@ -29,6 +29,45 @@ bool Pad::doesExpand() const {
     return m_expand;
 }
 
+PadWidget::PadWidget(int size, Widget* widget) {
+    m_widget = widget;
+    m_widget->autoresize();
+    m_widget->show();
+    this->add(widget);
+    this->pad(size);
+    this->show();
+}
+
+PadWidget::PadWidget(int size) : PadWidget(size, new Widget()) {}
+
+PadWidget::PadWidget() : PadWidget(0, new Widget()) {}
+
+void PadWidget::add(Widget* child) {
+    if (child == m_widget) {
+        Widget::add(child);
+    } else {
+        m_widget->add(child);
+    }
+}
+
+void PadWidget::pad(int size) {
+    m_pad = size;
+    m_widget->move(m_pad, m_pad);
+    this->update();
+}
+
+int PadWidget::pad() const {
+    return m_pad;
+}
+
+void PadWidget::updateSize(HDC hdc, SIZE available) {
+    available.cx -= m_pad * 2;
+    available.cy -= m_pad * 2;
+    Widget::updateSize(hdc, available);
+    auto size = m_widget->size();
+    this->resize(size.Width + m_pad * 2, size.Height + m_pad);
+}
+
 void Layout::updateSize(HDC hdc, SIZE available) {
     Widget::updateSize(hdc, available);
     this->arrange(available);
@@ -185,11 +224,16 @@ bool ResizeGrip::wantsMouse() const {
 }
 
 HCURSOR ResizeGrip::cursor() const {
-    return Manager::cursor(m_horizontal ? IDC_SIZEWE : IDC_SIZENS);
+    return Manager::cursor(
+        m_horizontal ?
+            (m_layout->m_collapsed ? IDC_HAND : IDC_SIZEWE) :
+            (m_layout->m_collapsed ? IDC_HAND : IDC_SIZENS)
+    );
 }
 
 void ResizeGrip::mousedown(int x, int y) {
     this->captureMouse();
+    m_layout->grow();
     m_mousestart = { x, y };
     m_pos = m_x + s_size;
     this->update();
@@ -198,6 +242,10 @@ void ResizeGrip::mousedown(int x, int y) {
 void ResizeGrip::mouseup(int x, int y) {
     this->releaseMouse();
     this->update();
+}
+
+void ResizeGrip::mousedoubleclick(int x, int y) {
+    m_layout->collapse();
 }
 
 void ResizeGrip::mousemove(int x, int y) {
@@ -286,8 +334,8 @@ void SplitLayout::hideSeparatorLine() {
 }
 
 void SplitLayout::paint(HDC hdc, PAINTSTRUCT* ps) {
-    m_first->paint(hdc, ps);
-    m_second->paint(hdc, ps);
+    if (!(m_collapsed && m_collapseFirst))  m_first->paint(hdc, ps);
+    if (!(m_collapsed && !m_collapseFirst)) m_second->paint(hdc, ps);
     m_separator->paint(hdc, ps);
 }
 
@@ -296,27 +344,30 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
     if (!m_split) {
         m_split = m_horizontal ? size.cx / 2 : size.cy / 2;
     }
+    if (m_min && m_split < m_min) m_split = m_min;
+    if (m_max && m_split > m_max) m_split = m_max;
+    auto asplit = m_collapsed ? (m_collapseFirst ? 0 : m_width) : m_split;
     auto fsize = size;
     auto ssize = size;
     POINT spos;
     POINT seppos;
     SIZE sepsize;
     if (m_horizontal) {
-        fsize.cx = m_split;
-        ssize.cx = size.cx - m_split;
-        spos.x = m_split;
+        fsize.cx = asplit;
+        ssize.cx = size.cx - asplit;
+        spos.x = asplit;
         spos.y = 0;
-        seppos.x = m_split - ResizeGrip::s_size;
+        seppos.x = asplit - ResizeGrip::s_size;
         seppos.y = 0;
         sepsize.cx = ResizeGrip::s_size * 2;
         sepsize.cy = size.cy;
     } else {
-        fsize.cy = m_split;
-        ssize.cy = size.cy - m_split;
+        fsize.cy = asplit;
+        ssize.cy = size.cy - asplit;
         spos.x = 0;
-        spos.y = m_split;
+        spos.y = asplit;
         seppos.x = 0;
-        seppos.y =  m_split - ResizeGrip::s_size;
+        seppos.y =  asplit - ResizeGrip::s_size;
         sepsize.cx = size.cx;
         sepsize.cy = ResizeGrip::s_size * 2;
     }
@@ -325,4 +376,24 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
     m_second->move(spos.x, spos.y);
     m_separator->move(seppos.x, seppos.y);
     m_separator->resize(sepsize.cx, sepsize.cy);
+}
+
+void SplitLayout::min(int m) {
+    m_min = m;
+    if (m_min && m_split < m_min) m_split = m_min;
+}
+
+void SplitLayout::max(int m) {
+    m_max = m;
+    if (m_max && m_split > m_max) m_split = m_max;
+}
+
+void SplitLayout::collapse() {
+    m_collapsed = true;
+    this->update();
+}
+
+void SplitLayout::grow() {
+    m_collapsed = false;
+    this->update();
 }
