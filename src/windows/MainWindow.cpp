@@ -7,7 +7,7 @@
 #include <Tab.hpp>
 #include "TestWindow.hpp"
 
-MainWindow::MainWindow() : Window("Geode App", 800, 600) {
+MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800, 600) {
     auto layout = new SplitLayout();
     layout->hideSeparatorLine();
 
@@ -16,7 +16,7 @@ MainWindow::MainWindow() : Window("Geode App", 800, 600) {
     auto vleft = new Tabs(new VerticalLayout());
     auto labelPad = new PadWidget(Tab::s_pad);
     auto label = new Label(
-        GEODEAPP_NAME " " GEODEAPP_VERSION
+        GEODEAPP_NAME " v" GEODEAPP_VERSION
     );
     label->wrap(false);
     labelPad->add(label);

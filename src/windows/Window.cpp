@@ -50,7 +50,7 @@ Window::Window(std::string const& title, int width, int height) {
     wcex.cbClsExtra     = 0;
     wcex.cbWndExtra     = 0;
     wcex.hInstance      = Manager::get()->getInst();
-    wcex.hIcon          = LoadIcon(wcex.hInstance, IDI_APPLICATION);
+    wcex.hIcon          = LoadIcon(wcex.hInstance, "applogo");
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
     wcex.hbrBackground  = (HBRUSH)GetStockObject(WHITE_BRUSH);
     wcex.lpszMenuName   = nullptr;
@@ -81,13 +81,6 @@ Window::Window(std::string const& title, int width, int height) {
 
     BOOL USE_DARK_MODE = true;
     DwmSetWindowAttribute(hwnd, 20, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
-
-    // MARGINS m;
-    // m.cxLeftWidth = 0;
-    // m.cxRightWidth = 0;
-    // m.cyTopHeight = 0;
-    // m.cyBottomHeight = 0;
-    // DwmExtendFrameIntoClientArea(hwnd, &m);
 
     m_hwnd = hwnd;
     m_type = "Window";
@@ -162,15 +155,46 @@ void Window::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
     g.FillRectangle(
         &SolidBrush(Style::BG()),
-        ps->rcPaint.left, ps->rcPaint.top,
-        ps->rcPaint.right - ps->rcPaint.left,
-        ps->rcPaint.bottom - ps->rcPaint.top
+        0, 0, m_width, m_height
     );
     Widget::paint(hdc, ps);
 }
 
 LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
+        // case WM_CREATE: {
+        //     RECT rcClient;
+        //     GetWindowRect(m_hwnd, &rcClient);
+
+        //     SetWindowPos(
+        //         m_hwnd, 
+        //         nullptr, 
+        //         rcClient.left, rcClient.top,
+        //         rcClient.right - rcClient.left,
+        //         rcClient.bottom - rcClient.top,
+        //         SWP_FRAMECHANGED
+        //     );
+        // } break;
+
+        // case WM_NCCALCSIZE: {
+        //     if (wp) {
+        //         auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
+        //         pncsp->rgrc[0].left   = pncsp->rgrc[0].left   + 0;
+        //         pncsp->rgrc[0].top    = pncsp->rgrc[0].top    + 0;
+        //         pncsp->rgrc[0].right  = pncsp->rgrc[0].right  - 0;
+        //         pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom - 0;
+        //     }
+        // } break;
+
+        // case WM_ACTIVATE: {
+        //     MARGINS margins;
+        //     margins.cxLeftWidth = 8;
+        //     margins.cxRightWidth = 8;
+        //     margins.cyBottomHeight = 20;
+        //     margins.cyTopHeight = 27;
+        //     DwmExtendFrameIntoClientArea(m_hwnd, &margins);
+        // } break;
+
         case WM_NCHITTEST: {
             LRESULT hit = DefWindowProc(m_hwnd, msg, wp, lp);
             if (this->isFullscreen()) return hit;
