@@ -56,20 +56,20 @@ public:
     virtual void add(Widget* child);
     virtual void remove(Widget* child, bool release = true);
     virtual void resize(int width, int height);
-    virtual void autoresize();
+    virtual void autoResize();
     virtual void move(int x, int y);
     virtual void show(bool v = true);
     void hide();
     virtual void update();
     virtual void enter();
     virtual void leave();
-    void tabenter();
-    void tableave();
+    void tabEnter();
+    void tabLeave();
     virtual void click();
-    virtual void mousedown(int x, int y);
-    virtual void mousedoubleclick(int x, int y);
-    virtual void mouseup(int x, int y);
-    virtual void mousemove(int x, int y);
+    virtual void mouseDown(int x, int y);
+    virtual void mouseDoubleClick(int x, int y);
+    virtual void mouseUp(int x, int y);
+    virtual void mouseMove(int x, int y);
     virtual bool wantsMouse() const;
     virtual const char* type() const;
 
@@ -99,12 +99,12 @@ class TextWidget : public ColorWidget {
 protected:
     std::string m_text;
     std::string m_font;
-    int m_fontsize = 20_px;
-    bool m_wordwrap = true;
+    int m_fontSize = 20_px;
+    bool m_wordWrap = true;
 
 public:
     virtual void text(std::string const& text);
-    std::string getText() const;
+    std::string text() const;
 
     void font(std::string const& font);
     virtual void font(std::string const& font, int size);

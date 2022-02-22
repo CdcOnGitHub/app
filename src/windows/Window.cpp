@@ -82,6 +82,13 @@ Window::Window(std::string const& title, int width, int height) {
     BOOL USE_DARK_MODE = true;
     DwmSetWindowAttribute(hwnd, 20, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
 
+    // MARGINS m;
+    // m.cxLeftWidth = 0;
+    // m.cxRightWidth = 0;
+    // m.cyTopHeight = 0;
+    // m.cyBottomHeight = 0;
+    // DwmExtendFrameIntoClientArea(hwnd, &m);
+
     m_hwnd = hwnd;
     m_type = "Window";
     m_width = width;
@@ -200,7 +207,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             m_mousedown = true;
             if (Widget::s_capturingWidget) {
                 Widget::s_capturingWidget->m_mousedown = true;
-                Widget::s_capturingWidget->mousedown(p.X, p.Y);
+                Widget::s_capturingWidget->mouseDown(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, true, 1);
             }
@@ -211,7 +218,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             m_mousedown = false;
             if (Widget::s_capturingWidget) {
                 Widget::s_capturingWidget->m_mousedown = false;
-                Widget::s_capturingWidget->mouseup(p.X, p.Y);
+                Widget::s_capturingWidget->mouseUp(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, false, 1);
             }
@@ -223,7 +230,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             if (Widget::s_capturingWidget) {
                 Widget::s_hoveredWidget = Widget::s_capturingWidget;
                 Widget::s_capturingWidget->m_mousedown = m_mousedown;
-                Widget::s_capturingWidget->mousemove(p.X, p.Y);
+                Widget::s_capturingWidget->mouseMove(p.X, p.Y);
             } else {
                 Widget::s_hoveredWidget = this->propagateMouseEvent(p, m_mousedown, 0);
             }
@@ -234,8 +241,8 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             m_mousedown = true;
             if (Widget::s_capturingWidget) {
                 Widget::s_capturingWidget->m_mousedown = true;
-                Widget::s_capturingWidget->mousedown(p.X, p.Y);
-                Widget::s_capturingWidget->mousedoubleclick(p.X, p.Y);
+                Widget::s_capturingWidget->mouseDown(p.X, p.Y);
+                Widget::s_capturingWidget->mouseDoubleClick(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, true, 2);
             }

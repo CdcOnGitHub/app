@@ -7,7 +7,7 @@ Checkbox::Checkbox(std::string const& text, bool checked) {
     this->text(text);
     this->font("Segoe UI");
     this->color(Style::text());
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -54,7 +54,7 @@ void Checkbox::updateSize(HDC hdc, SIZE available) {
         Graphics g(hdc);
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
-        Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+        Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
         g.MeasureString(
             toWString(m_text).c_str(), -1,
             &font, { 0, 0, static_cast<REAL>(available.cx), static_cast<REAL>(available.cy) },
@@ -74,17 +74,17 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
 
     Rect cr;
     cr.X = r.X;
-    cr.Y = r.Y + (r.Height - m_fontsize) / 2;
-    cr.Width = m_fontsize;
-    cr.Height = m_fontsize;
+    cr.Y = r.Y + (r.Height - m_fontSize) / 2;
+    cr.Width = m_fontSize;
+    cr.Height = m_fontSize;
 
-    r.X += m_fontsize + 5_px;
-    r.Width -= m_fontsize - 5_px;
+    r.X += m_fontSize + 5_px;
+    r.Width -= m_fontSize - 5_px;
 
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
 
-    auto color = m_checked ? Style::primary() : Style::secondary();
+    auto color = m_checked ? Style::primary() : Style::dark();
     FillRoundRect(&g, cr, 
         m_mousedown ?
             color::darken(color, 50) :
@@ -102,7 +102,7 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
         auto wt = w / t;
         auto wh = (t - 1) * wt;
         auto d = (cr.Height - wh) / 2;
-        Pen pen(Style::text(), m_fontsize / 7.f);
+        Pen pen(Style::text(), m_fontSize / 7.f);
         GraphicsPath path;
         path.AddLine(
             cr.X + p, cr.Y + d + (t - 2) * wt,
@@ -119,7 +119,7 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetAlignment(StringAlignmentNear);
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
     SolidBrush brush(m_color);
     g.DrawString(
         toWString(m_text).c_str(), -1,

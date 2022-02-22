@@ -6,6 +6,8 @@ project(GeodeAppWin VERSION 0.1.0)
 
 file(GLOB_RECURSE SOURCES src/*.cpp GeodeApp.exe.manifest)
 
+set(CMAKE_DEBUG_POSTFIX d)
+
 add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 8)

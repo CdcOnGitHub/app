@@ -18,6 +18,7 @@ struct Theme {
     Color m_separator;
     Color m_hover;
     Color m_selectedTab;
+    Color m_dark;
 
     enum class Default {
         Light, Dark,
@@ -44,6 +45,7 @@ public:
     DEF_THEME_GETTER(separator);
     DEF_THEME_GETTER(hover);
     DEF_THEME_GETTER(selectedTab);
+    DEF_THEME_GETTER(dark);
 
     static Style* current();
     void load(Theme const& theme);

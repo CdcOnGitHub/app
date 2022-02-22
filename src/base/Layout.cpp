@@ -31,7 +31,7 @@ bool Pad::doesExpand() const {
 
 PadWidget::PadWidget(int size, Widget* widget) {
     m_widget = widget;
-    m_widget->autoresize();
+    m_widget->autoResize();
     m_widget->show();
     this->add(widget);
     this->pad(size);
@@ -80,7 +80,7 @@ void Layout::pad(int p) {
 
 HorizontalLayout::HorizontalLayout() {
     m_type = "HorizontalLayout";
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -141,7 +141,7 @@ void HorizontalLayout::arrange(SIZE available) {
 
 VerticalLayout::VerticalLayout() {
     m_type = "VerticalLayout";
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -231,7 +231,7 @@ HCURSOR ResizeGrip::cursor() const {
     );
 }
 
-void ResizeGrip::mousedown(int x, int y) {
+void ResizeGrip::mouseDown(int x, int y) {
     this->captureMouse();
     m_layout->grow();
     m_mousestart = { x, y };
@@ -239,16 +239,16 @@ void ResizeGrip::mousedown(int x, int y) {
     this->update();
 }
 
-void ResizeGrip::mouseup(int x, int y) {
+void ResizeGrip::mouseUp(int x, int y) {
     this->releaseMouse();
     this->update();
 }
 
-void ResizeGrip::mousedoubleclick(int x, int y) {
+void ResizeGrip::mouseDoubleClick(int x, int y) {
     m_layout->collapse();
 }
 
-void ResizeGrip::mousemove(int x, int y) {
+void ResizeGrip::mouseMove(int x, int y) {
     if (m_mousedown) {
         if (m_horizontal) {
             m_moved = x - m_mousestart.x;
@@ -280,7 +280,7 @@ void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
     }
 }
 
-void ResizeGrip::hideline() {
+void ResizeGrip::hideLine() {
     m_paintLine = false;
     this->update();
 }
@@ -330,7 +330,7 @@ void SplitLayout::collapseFirst(bool first) {
 }
 
 void SplitLayout::hideSeparatorLine() {
-    m_separator->hideline();
+    m_separator->hideLine();
 }
 
 void SplitLayout::paint(HDC hdc, PAINTSTRUCT* ps) {

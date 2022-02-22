@@ -3,7 +3,7 @@
 RectWidget::RectWidget() {
     m_type = "RectWidget";
     this->color({ 255, 255, 255 });
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 

@@ -8,7 +8,7 @@ Button::Button(std::string const& text) {
     this->font("Segoe UI");
     this->color(Style::text());
     this->bg(Color(120, 120, 120));
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -42,7 +42,7 @@ void Button::updateSize(HDC hdc, SIZE available) {
         Graphics g(hdc);
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
-        Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+        Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
         g.MeasureString(
             toWString(m_text).c_str(), -1,
             &font, { 0, 0, static_cast<REAL>(available.cx), static_cast<REAL>(available.cy) },
@@ -77,7 +77,7 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetAlignment(StringAlignmentCenter);
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
     SolidBrush brush(m_color);
     g.DrawString(
         toWString(m_text).c_str(), -1,

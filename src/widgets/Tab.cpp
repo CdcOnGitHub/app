@@ -33,7 +33,7 @@ void Tabs::select(Tab* tab) {
 }
 
 TabSeparator::TabSeparator() {
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -64,7 +64,7 @@ Tab::Tab(std::string const& text, Tab::Type type) {
     m_type = type;
     this->text(text);
     this->color(Style::text());
-    this->autoresize();
+    this->autoResize();
     this->fontSize(16_px);
     this->show();
 }
@@ -140,7 +140,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
     f.SetFormatFlags(StringFormatFlagsNoFitBlackBox);
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
     SolidBrush brush(color::alpha(m_color, m_hovered || m_selected ? 255 : 125));
     FontFamily family;
     font.GetFamily(&family);
@@ -188,7 +188,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     }
 
     if ((m_hovered || m_selected) && m_width > s_pad * 2 + s_dot + s_arrow * 2) {
-        Pen pen(Style::text(), m_fontsize / 8.f);
+        Pen pen(Style::text(), m_fontSize / 8.f);
         GraphicsPath path;
         auto pad = (s_height - s_arrow) / 2;
         path.AddLine(

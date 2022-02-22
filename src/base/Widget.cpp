@@ -92,7 +92,7 @@ void Widget::resize(int w, int h) {
     m_height = h;
 }
 
-void Widget::autoresize() {
+void Widget::autoResize() {
     m_autoresize = true;
 }
 
@@ -112,19 +112,19 @@ void Widget::leave() {
     this->update();
 }
 void Widget::click() {}
-void Widget::mousedoubleclick(int x, int y) {}
-void Widget::mousemove(int x, int y) {}
-void Widget::mousedown(int x, int y) {}
-void Widget::mouseup(int x, int y) {
+void Widget::mouseDoubleClick(int x, int y) {}
+void Widget::mouseMove(int x, int y) {}
+void Widget::mouseDown(int x, int y) {}
+void Widget::mouseUp(int x, int y) {
     this->click();
 }
 
-void Widget::tabenter() {
+void Widget::tabEnter() {
     this->m_tabbed = true;
     this->update();
 }
 
-void Widget::tableave() {
+void Widget::tabLeave() {
     this->m_tabbed = false;
     this->update();
 }
@@ -147,10 +147,10 @@ bool Widget::propagateTabEvent(int& index, int target) {
     for (auto& child : m_children) {
         if (child->m_visible && child->wantsMouse()) {
             if (index == target) {
-                child->tabenter();
+                child->tabEnter();
                 return true;
             }
-            child->tableave();
+            child->tabLeave();
             index++;
         }
         if (child->propagateTabEvent(index, target))
@@ -174,25 +174,25 @@ Widget* Widget::propagateMouseEvent(Point& p, bool down, int clickCount) {
                             child->m_mousedown = down;
                             child->enter();
                         }
-                        child->mousemove(p.X, p.Y);
+                        child->mouseMove(p.X, p.Y);
                     } break;
 
                     case 1: {
                         if (down) {
                             child->m_mousedown = true;
-                            child->mousedown(p.X, p.Y);
+                            child->mouseDown(p.X, p.Y);
                             child->update();
                         } else {
                             child->m_mousedown = false;
-                            child->mouseup(p.X, p.Y);
+                            child->mouseUp(p.X, p.Y);
                             child->update();
                         }
                     } break;
 
                     default: {
                         child->m_mousedown = true;
-                        child->mousedown(p.X, p.Y);
-                        child->mousedoubleclick(p.X, p.Y);
+                        child->mouseDown(p.X, p.Y);
+                        child->mouseDoubleClick(p.X, p.Y);
                         child->update();
                     } break;
                 }
@@ -288,17 +288,17 @@ void TextWidget::text(std::string const& text) {
     this->m_text = text;
 }
 
-std::string TextWidget::getText() const {
+std::string TextWidget::text() const {
     return m_text;
 }
 
 void TextWidget::font(std::string const& font, int size) {
     m_font = font;
-    m_fontsize = size;
+    m_fontSize = size;
 }
 
 void TextWidget::font(std::string const& font) {
-    this->font(font, m_fontsize);
+    this->font(font, m_fontSize);
 }
 
 void TextWidget::fontSize(int size) {
@@ -306,5 +306,5 @@ void TextWidget::fontSize(int size) {
 }
 
 void TextWidget::wrap(bool on) {
-    m_wordwrap = on;
+    m_wordWrap = on;
 }

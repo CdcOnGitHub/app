@@ -111,11 +111,11 @@ public:
 
     bool wantsMouse() const override;
     HCURSOR cursor() const;
-    void mousedown(int x, int y) override;
-    void mouseup(int x, int y) override;
-    void mousemove(int x, int y) override;
-    void mousedoubleclick(int x, int y) override;
-    void hideline();
+    void mouseDown(int x, int y) override;
+    void mouseUp(int x, int y) override;
+    void mouseMove(int x, int y) override;
+    void mouseDoubleClick(int x, int y) override;
+    void hideLine();
 
     void paint(HDC, PAINTSTRUCT*) override;
 };

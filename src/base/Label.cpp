@@ -6,7 +6,7 @@ Label::Label(std::string const& text) {
     this->text(text);
     this->font("Segoe UI");
     this->color(Style::text());
-    this->autoresize();
+    this->autoResize();
     this->show();
 }
 
@@ -15,8 +15,8 @@ void Label::updateSize(HDC hdc, SIZE available) {
         Graphics g(hdc);
         g.SetSmoothingMode(SmoothingModeAntiAlias);
         RectF r;
-        Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
-        if (m_wordwrap) {
+        Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
+        if (m_wordWrap) {
             g.MeasureString(
                 toWString(m_text).c_str(), -1,
                 &font, { 
@@ -49,9 +49,9 @@ void Label::paint(HDC hdc, PAINTSTRUCT* ps) {
     g.SetSmoothingMode(SmoothingModeAntiAlias);
 
     StringFormat f;
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontsize));
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
     SolidBrush brush(m_color);
-    if (m_wordwrap) {
+    if (m_wordWrap) {
         g.DrawString(
             toWString(m_text).c_str(), -1,
             &font, toRectF(r), &f, &brush
