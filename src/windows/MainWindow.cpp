@@ -7,45 +7,75 @@
 #include "TestWindow.hpp"
 #include <Context.hpp>
 
+template<>
+void MainWindow::createTab<"general"_id>(VerticalLayout* page) {
+    auto label = new Label("Welcome to " GEODEAPP_NAME " v" GEODEAPP_VERSION);
+    page->add(label);
+}
+
+template<>
+void MainWindow::createTab<"tools"_id>(VerticalLayout* page) {
+    auto label = new Label("Tools:tm:");
+    page->add(label);
+}
+
+template<>
+void MainWindow::createTab<"settings"_id>(VerticalLayout* page) {
+    auto title = new Label("Settings");
+    title->style(FontStyleBold);
+    title->fontSize(34_px);
+    page->add(title);
+
+    page->add(new Pad(Tab::s_pad - 10_px));
+
+    auto button = new Button("Open Test Window");
+    button->bg(Style::primary());
+    button->callback([](auto) -> void { new TestWindow(); });
+    page->add(button);
+
+    auto lightMode = new Checkbox(
+        "Light Theme",
+        Manager::get()->theme() == Theme::Default::Light
+    );
+    page->add(lightMode);
+}
+
+template<size_t ID>
+void MainWindow::createTab() {
+    auto page = new VerticalLayout();
+    page->align(VerticalLayout::Start);
+    page->fill();
+    page->pad(5_px);
+    this->createTab<ID>(page);
+    m_pages.insert({ ID, page });
+}
+
+void MainWindow::createTabs() {
+    this->createTab<"general"_id>();
+    this->createTab<"tools"_id>();
+    this->createTab<"settings"_id>();
+}
+
 void MainWindow::onTab(size_t id) {
-    m_page->clear();
-    switch (id) {
-        case "general"_id: {
-            auto label = new Label("Welcome to " GEODEAPP_NAME " v" GEODEAPP_VERSION);
-            m_page->add(label);
-        } break;
-
-        case "tools"_id: {
-            auto label = new Label("Tools:tm:");
-            m_page->add(label);
-        } break;
-
-        case "settings"_id: {
-            auto title = new Label("Settings");
-            m_page->add(title);
-
-            auto button = new Button("Open Test Window");
-            button->bg(Style::primary());
-            button->callback([](auto) -> void { new TestWindow(); });
-            m_page->add(button);
-
-            auto lightMode = new Checkbox(
-                "Light Theme",
-                Manager::get()->theme() == Theme::Default::Light
-            );
-            m_page->add(lightMode);
-        } break;
+    if (m_pages.count(id)) {
+        m_page->widget(m_pages.at(id), false);
     }
+}
+
+MainWindow::~MainWindow() {
+    for (auto& [_, p] : m_pages) {
+        delete p;
+    }
+    m_page = nullptr;
 }
 
 MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px) {
     auto layout = new SplitLayout();
     layout->hideSeparatorLine();
 
-    auto pageLayout = new VerticalLayout();
-    pageLayout->fill();
-    pageLayout->align(VerticalLayout::Middle);
-    m_page = new PadWidget(Tab::s_pad, pageLayout);
+    this->createTabs();
+
+    m_page = new PadWidget(Tab::s_pad, nullptr);
     layout->second(m_page);
 
     auto sidebarBG = new RectWidget();

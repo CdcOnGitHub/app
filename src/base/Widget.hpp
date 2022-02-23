@@ -118,7 +118,7 @@ public:
 
     void font(std::string const& font);
     virtual void font(std::string const& font, int size);
-    virtual void fontSize(int size = 20);
+    virtual void fontSize(int size = 20_px);
     void wrap(bool);
     void style(int style);
 };

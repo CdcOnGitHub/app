@@ -30,10 +30,7 @@ bool Pad::doesExpand() const {
 }
 
 PadWidget::PadWidget(int size, Widget* widget) {
-    m_widget = widget;
-    m_widget->autoResize();
-    m_widget->show();
-    this->add(widget);
+    this->widget(widget);
     this->pad(size);
     this->show();
 }
@@ -46,25 +43,42 @@ Widget* PadWidget::widget() const {
     return m_widget;
 }
 
+void PadWidget::widget(Widget* other, bool releaseOld) {
+    if (m_widget) {
+        this->remove(m_widget, releaseOld);
+    }
+    m_widget = other;
+    if (other) {
+        m_widget->autoResize();
+        m_widget->show();
+        this->add(m_widget);
+        this->pad(m_pad);
+    }
+}
+
 void PadWidget::add(Widget* child) {
     if (child == m_widget) {
         Widget::add(child);
     } else {
-        m_widget->add(child);
+        if (m_widget) m_widget->add(child);
     }
 }
 
 void PadWidget::remove(Widget* child, bool release) {
-    m_widget->remove(child, release);
+    if (child == m_widget) {
+        Widget::remove(child, release);
+    } else {
+        if (m_widget) m_widget->remove(child, release);
+    }
 }
 
 void PadWidget::clear() {
-    m_widget->clear();
+    if (m_widget) m_widget->clear();
 }
 
 void PadWidget::pad(int size) {
     m_pad = size;
-    m_widget->move(m_pad, m_pad);
+    if (m_widget) m_widget->move(m_pad, m_pad);
     this->update();
 }
 
@@ -73,6 +87,7 @@ int PadWidget::pad() const {
 }
 
 void PadWidget::updateSize(HDC hdc, SIZE available) {
+    if (!m_widget) return;
     available.cx -= m_pad * 2;
     available.cy -= m_pad * 2;
     Widget::updateSize(hdc, available);

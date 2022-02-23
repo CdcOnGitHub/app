@@ -31,7 +31,7 @@ void Widget::releaseMouse() {
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
-        child->m_window = m_window;
+        child->setWindow(m_window);
         child->updatePosition();
         this->m_children.push_back(child);
     }
@@ -228,7 +228,9 @@ Widget* Widget::propagateMouseEvent(Point& p, bool down, int clickCount) {
 }
 
 void Widget::update() {
-    if (m_window) m_window->updateWindow();
+    if (m_window) {
+        m_window->updateWindow();
+    }
 }
 
 void Widget::updateSize(HDC hdc, SIZE available) {
