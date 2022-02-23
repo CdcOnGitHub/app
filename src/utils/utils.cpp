@@ -139,6 +139,10 @@ std::ostream& operator<<(std::ostream& stream, SIZE p) {
     return stream << "cx: " << p.cx << ", cy: " << p.cy;
 }
 
+std::ostream& operator<<(std::ostream& stream, Rect p) {
+    return stream << p.X << ", " << p.Y << ", " << p.Width << ", " << p.Height;
+}
+
 std::wstring toWString(std::string const& str) {
     if (str.empty()) {
         return std::wstring();

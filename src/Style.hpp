@@ -19,6 +19,7 @@ struct Theme {
     Color m_hover;
     Color m_selectedTab;
     Color m_dark;
+    Color m_inputBG;
 
     enum class Default {
         Light, Dark,
@@ -46,6 +47,7 @@ public:
     DEF_THEME_GETTER(hover);
     DEF_THEME_GETTER(selectedTab);
     DEF_THEME_GETTER(dark);
+    DEF_THEME_GETTER(inputBG);
 
     static Style* current();
     void load(Theme const& theme);

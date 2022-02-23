@@ -31,6 +31,7 @@ Theme g_light = {
     Color(55, 0, 0, 0),
     Color(255, 255, 255),
     Color(180, 180, 180),
+    Color(180, 180, 180),
 };
 
 Theme g_dark = {
@@ -45,6 +46,7 @@ Theme g_dark = {
     Color(55, 255, 255, 255),
     Color(38, 36, 45),
     Color(109, 104, 130),
+    Color(25, 24, 30),
 };
 
 Theme& Theme::get(Theme::Default d) {

@@ -15,6 +15,7 @@ void FillRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, 
 std::ostream& operator<<(std::ostream&, RECT);
 std::ostream& operator<<(std::ostream&, SIZE);
 std::ostream& operator<<(std::ostream&, POINT);
+std::ostream& operator<<(std::ostream&, Rect);
 
 std::wstring toWString(std::string const& str);
 RectF toRectF(Rect const& r);

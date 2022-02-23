@@ -24,6 +24,7 @@ protected:
     bool m_hovered = false;
     bool m_mousedown = false;
     bool m_tabbed = false;
+    bool m_keyboardFocused = false;
     Widget* m_parent = nullptr;
     Window* m_window = nullptr;
     std::vector<Widget*> m_children;
@@ -75,8 +76,8 @@ public:
     virtual void mouseUp(int x, int y);
     virtual void mouseMove(int x, int y);
     virtual bool wantsMouse() const;
-    virtual void keyDown(int key);
-    virtual void keyUp(int key);
+    virtual void keyDown(size_t key, size_t scanCode);
+    virtual void keyUp(size_t key, size_t scanCode);
     virtual const char* type() const;
     
     void userData(void*);
@@ -112,7 +113,46 @@ protected:
     bool m_wordWrap = true;
     int m_style = 0;
 
+    RectF measureText(
+        HDC hdc,
+        std::string const& text,
+        std::string const& font,
+        int fontSize,
+        int style,
+        SIZE const& available,
+        StringFormat const& format
+    );
+    RectF measureText(
+        HDC hdc,
+        std::string const& text,
+        SIZE const& available,
+        StringFormat const& format
+    );
     RectF measureText(HDC hdc, SIZE const& available, StringFormat const& format = StringFormat());
+
+    void paintText(
+        HDC hdc,
+        std::string const& text,
+        std::string const& font,
+        int fontSize,
+        int style,
+        Color const& color,
+        Rect const& drawRect,
+        StringFormat const& format
+    );
+    void paintText(
+        HDC hdc,
+        std::string const& text,
+        int style,
+        Color const& color,
+        Rect const& drawRect
+    );
+    void paintText(
+        HDC hdc,
+        std::string const& text,
+        Rect const& drawRect,
+        StringFormat const& format
+    );
     void paintText(HDC hdc, Rect const& drawRect, StringFormat const& format = StringFormat());
 
 public:

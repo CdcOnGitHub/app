@@ -305,6 +305,7 @@ void ResizeGrip::mouseDoubleClick(int x, int y) {
 }
 
 void ResizeGrip::mouseMove(int x, int y) {
+    if (Widget::s_capturingWidget != this) return;
     if (m_mousedown) {
         if (m_horizontal) {
             m_moved = x - m_mousestart.x;

@@ -7,36 +7,70 @@
 
 static std::unordered_map<HWND, Window*> g_windows;
 
-enum ACCENTFLAGS {
-    AF_DRAWNOBORDERS = 0x0,
-    AF_DRAWLEFTBORDER = 0x20,
-    AF_DRAWTOPBORDER = 0x40,
-    AF_DRAWRIGHTBORDER = 0x80,
-    AF_DRAWBOTTOMBORDER = 0x100,
-    AF_DRAWALLBORDERS = AF_DRAWLEFTBORDER | AF_DRAWTOPBORDER | AF_DRAWRIGHTBORDER | AF_DRAWBOTTOMBORDER
-};
+// typedef enum _WINDOWCOMPOSITIONATTRIB
+// {
+// 	WCA_UNDEFINED = 0,
+// 	WCA_NCRENDERING_ENABLED = 1,
+// 	WCA_NCRENDERING_POLICY = 2,
+// 	WCA_TRANSITIONS_FORCEDISABLED = 3,
+// 	WCA_ALLOW_NCPAINT = 4,
+// 	WCA_CAPTION_BUTTON_BOUNDS = 5,
+// 	WCA_NONCLIENT_RTL_LAYOUT = 6,
+// 	WCA_FORCE_ICONIC_REPRESENTATION = 7,
+// 	WCA_EXTENDED_FRAME_BOUNDS = 8,
+// 	WCA_HAS_ICONIC_BITMAP = 9,
+// 	WCA_THEME_ATTRIBUTES = 10,
+// 	WCA_NCRENDERING_EXILED = 11,
+// 	WCA_NCADORNMENTINFO = 12,
+// 	WCA_EXCLUDED_FROM_LIVEPREVIEW = 13,
+// 	WCA_VIDEO_OVERLAY_ACTIVE = 14,
+// 	WCA_FORCE_ACTIVEWINDOW_APPEARANCE = 15,
+// 	WCA_DISALLOW_PEEK = 16,
+// 	WCA_CLOAK = 17,
+// 	WCA_CLOAKED = 18,
+// 	WCA_ACCENT_POLICY = 19,
+// 	WCA_FREEZE_REPRESENTATION = 20,
+// 	WCA_EVER_UNCLOAKED = 21,
+// 	WCA_VISUAL_OWNER = 22,
+// 	WCA_HOLOGRAPHIC = 23,
+// 	WCA_EXCLUDED_FROM_DDA = 24,
+// 	WCA_PASSIVEUPDATEMODE = 25,
+// 	WCA_USEDARKMODECOLORS = 26,
+// 	WCA_CORNER_STYLE = 27,
+// 	WCA_PART_COLOR = 28,
+// 	WCA_DISABLE_MOVESIZE_FEEDBACK = 29,
+// 	WCA_LAST = 30
+// } WINDOWCOMPOSITIONATTRIB;
 
-enum ACCENTSTATE {
-    ACCENT_DISABLED = 0,
-    ACCENT_ENABLE_GRADIENT = 1,
-    ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
-    ACCENT_ENABLE_BLURBEHIND = 3,
-    ACCENT_INVALID_STATE = 4
-};
+// typedef struct _WINDOWCOMPOSITIONATTRIBDATA
+// {
+// 	WINDOWCOMPOSITIONATTRIB Attrib;
+// 	PVOID pvData;
+// 	SIZE_T cbData;
+// } WINDOWCOMPOSITIONATTRIBDATA;
 
-static constexpr const auto WCA_ACCENT_POLICY = 19;
+// typedef enum _ACCENT_STATE
+// {
+// 	ACCENT_DISABLED = 0,
+// 	ACCENT_ENABLE_GRADIENT = 1,
+// 	ACCENT_ENABLE_TRANSPARENTGRADIENT = 2,
+// 	ACCENT_ENABLE_BLURBEHIND = 3,
+// 	ACCENT_ENABLE_ACRYLICBLURBEHIND = 4, // RS4 1803
+// 	ACCENT_ENABLE_HOSTBACKDROP = 5, // RS5 1809
+//  	ACCENT_INVALID_STATE = 6
+// } ACCENT_STATE;
 
-struct ACCENTPOLICY {
-    ACCENTSTATE eAccentState;
-    ACCENTFLAGS eAccentFlags;
-    int nGradientColor;
-    int nAnimationId;
-};
-struct WINCOMPATTRDATA {
-    int nAttribute;
-    PVOID pvData;
-    ULONG ulSizeOfData;
-};
+// typedef struct _ACCENT_POLICY
+// {
+// 	ACCENT_STATE AccentState;
+// 	DWORD AccentFlags;
+// 	DWORD GradientColor;
+// 	DWORD AnimationId;
+// } ACCENT_POLICY;
+
+// typedef BOOL (WINAPI *pfnGetWindowCompositionAttribute)(HWND, WINDOWCOMPOSITIONATTRIBDATA*);
+
+// typedef BOOL (WINAPI *pfnSetWindowCompositionAttribute)(HWND, WINDOWCOMPOSITIONATTRIBDATA*);
 
 Window::Window(std::string const& title, bool hasParent, int width, int height) {
     WNDCLASSEXA wcex;
@@ -183,24 +217,38 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             return DefWindowProc(m_hwnd, msg, wp, lp);
         } break;
 
-        case WM_NCCALCSIZE: {
-            if (wp) {
-                auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
-                pncsp->rgrc[0].left   = pncsp->rgrc[0].left   + EXTEND_SIDE;
-                pncsp->rgrc[0].right  = pncsp->rgrc[0].right  - EXTEND_SIDE;
-                pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom - EXTEND_SIDE;
-                return 0;
-            }
-        } break;
+        // case WM_NCCALCSIZE: {
+        //     if (wp) {
+        //         auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
+        //         pncsp->rgrc[0].left   = pncsp->rgrc[0].left   + EXTEND_SIDE;
+        //         pncsp->rgrc[0].right  = pncsp->rgrc[0].right  - EXTEND_SIDE;
+        //         pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom - EXTEND_SIDE;
+        //         return 0;
+        //     }
+        // } break;
 
-        case WM_ACTIVATE: {
-            MARGINS margins;
-            margins.cxLeftWidth = EXTEND_SIDE;
-            margins.cxRightWidth = - EXTEND_SIDE;
-            margins.cyBottomHeight = - EXTEND_SIDE;
-            margins.cyTopHeight = EXTEND_TOP;
-            DwmExtendFrameIntoClientArea(m_hwnd, &margins);
-        } break;
+        // case WM_ACTIVATE: {
+        //     MARGINS margins;
+        //     margins.cxLeftWidth = EXTEND_SIDE;
+        //     margins.cxRightWidth = - EXTEND_SIDE;
+        //     margins.cyBottomHeight = - EXTEND_SIDE;
+        //     margins.cyTopHeight = EXTEND_TOP;
+        //     DwmExtendFrameIntoClientArea(m_hwnd, &margins);
+
+        //     HMODULE hUser = GetModuleHandleA("user32.dll");
+        //     if (hUser) {
+        //         pfnSetWindowCompositionAttribute setWindowCompositionAttribute =
+        //             (pfnSetWindowCompositionAttribute)GetProcAddress(hUser, "SetWindowCompositionAttribute");
+        //         if (setWindowCompositionAttribute) {
+        //             ACCENT_POLICY accent = { ACCENT_ENABLE_GRADIENT, 0, 0, 0 };
+        //             WINDOWCOMPOSITIONATTRIBDATA data;
+        //             data.Attrib = WCA_ACCENT_POLICY;
+        //             data.pvData = &accent;
+        //             data.cbData = sizeof(accent);
+        //             setWindowCompositionAttribute(m_hwnd, &data);
+        //         }
+        //     }
+        // } break;
 
         case WM_NCHITTEST: {
             // if (this->isFullscreen()) return hit;
@@ -242,12 +290,12 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 hit = hitTests[uRow][uCol];
             }
 
-
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
             if (Widget::s_capturingWidget) return hit;
             if (this->propagateCaptureMouse(toPoint(p))) return hit;
             Widget::s_hoveredWidget = this->propagateMouseEvent(toPoint(p), m_mousedown, 0);
-            
+            if (Widget::s_keyboardWidget) return hit;
+
             if (hit == HTCLIENT) hit = HTCAPTION;
             
             return hit;
@@ -284,6 +332,10 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 Widget::s_capturingWidget->mouseDown(p.X, p.Y);
             } else {
                 this->propagateMouseEvent(p, true, 1);
+            }
+            if (!Widget::s_hoveredWidget && Widget::s_keyboardWidget) {
+                Widget::s_keyboardWidget->releaseKeyboard();
+                Widget::s_keyboardWidget = nullptr;
             }
         } break;
 
@@ -337,7 +389,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 if (wp == VK_ESCAPE) {
                     Widget::s_keyboardWidget = nullptr;
                 } else {
-                    Widget::s_keyboardWidget->keyDown(wp);
+                    Widget::s_keyboardWidget->keyDown(wp, LOBYTE(HIWORD(lp)));
                     return 0;
                 }
             }
@@ -360,7 +412,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
 
         case WM_KEYUP: {
             if (Widget::s_keyboardWidget) {
-                Widget::s_keyboardWidget->keyUp(wp);
+                Widget::s_keyboardWidget->keyUp(wp, LOBYTE(HIWORD(lp)));
             }
         } break;
 

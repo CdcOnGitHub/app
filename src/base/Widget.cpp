@@ -29,6 +29,23 @@ void Widget::releaseMouse() {
     }
 }
 
+void Widget::captureKeyboard() {
+    if (s_keyboardWidget) {
+        s_keyboardWidget->releaseKeyboard();
+    }
+    m_keyboardFocused = true;
+    s_keyboardWidget = this;
+    this->update();
+}
+
+void Widget::releaseKeyboard() {
+    if (s_keyboardWidget == this) {
+        m_keyboardFocused = false;
+        s_keyboardWidget = nullptr;
+    }
+    this->update();
+}
+
 void Widget::add(Widget* child) {
     if (!child->m_parent) {
         child->m_parent = this;
@@ -135,8 +152,8 @@ void Widget::mouseUp(int x, int y) {
     this->click();
 }
 
-void Widget::keyDown(int key) {}
-void Widget::keyUp(int key) {}
+void Widget::keyDown(size_t key, size_t scanCode) {}
+void Widget::keyUp(size_t key, size_t scanCode) {}
 
 void Widget::tabEnter() {
     this->m_tabbed = true;
@@ -328,14 +345,22 @@ void TextWidget::style(int style) {
     this->update();
 }
 
-RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const& format) {
+RectF TextWidget::measureText(
+    HDC hdc,
+    std::string const& text,
+    std::string const& fontFamily,
+    int fontSize,
+    int style,
+    SIZE const& available,
+    StringFormat const& format
+) {
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
     RectF r;
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize, m_style));
+    Font font(hdc, Manager::get()->loadFont(fontFamily, fontSize, style));
     if (m_wordWrap) {
         g.MeasureString(
-            toWString(m_text).c_str(), -1,
+            toWString(text).c_str(), -1,
             &font, { 
                 0, 0,
                 static_cast<REAL>(available.cx),
@@ -344,7 +369,7 @@ RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const
         );
     } else {
         g.MeasureString(
-            toWString(m_text).c_str(), -1,
+            toWString(text).c_str(), -1,
             &font, { 
                 0, 0, 0, 0
             }, &format, &r
@@ -355,25 +380,70 @@ RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const
     return r;
 }
 
-void TextWidget::paintText(HDC hdc, Rect const& drawRect, StringFormat const& format) {
+RectF TextWidget::measureText(
+    HDC hdc,
+    std::string const& text,
+    SIZE const& available,
+    StringFormat const& format
+) {
+    return this->measureText(hdc, text, m_font, m_fontSize, m_style, available, format);
+}
+
+RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const& format) {
+    return this->measureText(hdc, m_text, m_font, m_fontSize, m_style, available, format);
+}
+
+void TextWidget::paintText(
+    HDC hdc,
+    std::string const& text,
+    std::string const& fontFamily,
+    int fontSize,
+    int style,
+    Color const& color,
+    Rect const& drawRect,
+    StringFormat const& format
+) {
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
 
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize, m_style));
-    SolidBrush brush(m_color);
+    Font font(hdc, Manager::get()->loadFont(fontFamily, fontSize, style));
+    SolidBrush brush(color);
     if (m_wordWrap) {
         g.DrawString(
-            toWString(m_text).c_str(), -1,
+            toWString(text).c_str(), -1,
             &font, toRectF(drawRect), &format, &brush
         );
     } else {
         Region reg(drawRect);
         g.SetClip(&reg);
         g.DrawString(
-            toWString(m_text).c_str(), -1,
+            toWString(text).c_str(), -1,
             &font, toPointF(drawRect), &format, &brush
         );
     }
+}
+
+void TextWidget::paintText(
+    HDC hdc,
+    std::string const& text,
+    int style,
+    Color const& color,
+    Rect const& drawRect
+) {
+    return this->paintText(hdc, text, m_font, m_fontSize, style, color, drawRect, StringFormat());
+}
+
+void TextWidget::paintText(
+    HDC hdc,
+    std::string const& text,
+    Rect const& drawRect,
+    StringFormat const& format
+) {
+    return this->paintText(hdc, text, m_font, m_fontSize, m_style, m_color, drawRect, format);
+}
+
+void TextWidget::paintText(HDC hdc, Rect const& drawRect, StringFormat const& format) {
+    return this->paintText(hdc, m_text, m_font, m_fontSize, m_style, m_color, drawRect, format);
 }
 
 void TextWidget::paint(HDC hdc, PAINTSTRUCT* ps) {

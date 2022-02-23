@@ -1,6 +1,9 @@
 #include "CreateContextWindow.hpp"
+#include <Input.hpp>
 
 CreateContextWindow::CreateContextWindow() : Window("New Context", true, 400_px, 320_px) {
+    auto padding = new PadWidget(Tab::s_pad);
+
     auto layout = new VerticalLayout();
     layout->fill();
 
@@ -9,5 +12,12 @@ CreateContextWindow::CreateContextWindow() : Window("New Context", true, 400_px,
     title->style(FontStyleBold);
     layout->add(title, VerticalLayout::Middle);
 
-    this->add(layout);
+    auto input = new Input();
+    input->wrap(false);
+    input->placeHolder("Context Name...");
+    layout->add(input);
+
+    padding->add(layout);
+
+    this->add(padding);
 }
