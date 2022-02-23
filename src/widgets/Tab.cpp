@@ -19,6 +19,10 @@ void Tabs::add(Widget* w) {
     m_layout->add(w);
 }
 
+void Tabs::onSelect(SelectFunc func) {
+    m_func = func;
+}
+
 Tabs::Tabs(Layout* l) {
     m_layout = l;
     this->add(m_layout);
@@ -28,6 +32,9 @@ Tabs::Tabs(Layout* l) {
 void Tabs::select(Tab* tab) {
     for (auto& t : m_tabs) {
         t->m_selected = t == tab;
+        if (t == tab && t->m_id && m_func) {
+            m_func(t->m_id);
+        }
         t->update();
     }
 }
@@ -59,7 +66,7 @@ void TabSeparator::paint(HDC hdc, PAINTSTRUCT* ps) {
     Widget::paint(hdc, ps);
 }
 
-Tab::Tab(std::string const& text, Tab::Type type) {
+Tab::Tab(size_t id, std::string const& text, Tab::Type type) : m_id(id) {
     m_dotColor = Tab::dot();
     m_type = type;
     this->text(text);
@@ -68,6 +75,8 @@ Tab::Tab(std::string const& text, Tab::Type type) {
     this->fontSize(16_px);
     this->show();
 }
+
+Tab::Tab(std::string const& text, Tab::Type type) : Tab(0, text, type) {}
 
 void Tab::updateSize(HDC hdc, SIZE size) {
     Widget::updateSize(hdc, size);

@@ -217,4 +217,3 @@ Color color::alpha(Color const& color, BYTE newAlpha) {
 Color color::alpha(Color const& color, int newAlpha) {
     return color::alpha(color, static_cast<BYTE>(newAlpha));
 }
-

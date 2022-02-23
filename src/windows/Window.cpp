@@ -67,8 +67,7 @@ Window::Window(std::string const& title, int width, int height) {
         title.c_str(),
         WS_OVERLAPPEDWINDOW | WS_EX_LAYERED,
         CW_USEDEFAULT, CW_USEDEFAULT,
-        Manager::scale(width),
-        Manager::scale(height),
+        width, height,
         nullptr,
         nullptr,
         Manager::get()->getInst(),
@@ -83,7 +82,7 @@ Window::Window(std::string const& title, int width, int height) {
     DwmSetWindowAttribute(hwnd, 20, &USE_DARK_MODE, sizeof(USE_DARK_MODE));
 
     m_hwnd = hwnd;
-    m_type = "Window";
+    m_typeName = "Window";
     m_width = width;
     m_height = height;
 
@@ -142,8 +141,8 @@ void Window::center() {
     RECT rc;
     GetWindowRect(m_hwnd, &rc);
     this->move(
-        (GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
-        (GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2
+        Manager::scale((GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2),
+        Manager::scale((GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2)
     );
 }
 

@@ -33,6 +33,8 @@ public:
 
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
+    void remove(Widget* child, bool release = true) override;
+    void clear() override;
 };
 
 class Layout : public Widget {

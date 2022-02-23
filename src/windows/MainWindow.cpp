@@ -3,51 +3,59 @@
 #include <Button.hpp>
 #include <RectWidget.hpp>
 #include <Checkbox.hpp>
-#include <Layout.hpp>
 #include <Tab.hpp>
 #include "TestWindow.hpp"
 
-MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800, 600) {
+void MainWindow::onTab(size_t id) {
+    m_page->clear();
+    switch (id) {
+        case "general"_id: {
+            auto label = new Label("Welcome to " GEODEAPP_NAME " v" GEODEAPP_VERSION);
+            m_page->add(label);
+        } break;
+
+        case "advanced"_id: {
+            auto label = new Label("Advanced:tm:");
+            m_page->add(label);
+        } break;
+    }
+}
+
+MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px) {
     auto layout = new SplitLayout();
     layout->hideSeparatorLine();
 
-    auto left = new RectWidget();
-    left->color(Style::sidebar());
-    auto vleft = new Tabs(new VerticalLayout());
+    m_page = new PadWidget(Tab::s_pad, new VerticalLayout());
+    layout->second(m_page);
+
+    auto sidebarBG = new RectWidget();
+    sidebarBG->color(Style::sidebar());
+
+    auto sidebarTabs = new Tabs(new VerticalLayout());
+    sidebarTabs->onSelect(std::bind(&MainWindow::onTab, this, std::placeholders::_1));
+
     auto labelPad = new PadWidget(Tab::s_pad);
     auto label = new Label(
         GEODEAPP_NAME " v" GEODEAPP_VERSION
     );
     label->wrap(false);
     labelPad->add(label);
-    vleft->add(labelPad);
-    vleft->add(new Tab("General", Tab::Diamond));
-    vleft->add(new Tab("Advanced", Tab::Diamond));
-    vleft->add(new Tab("Tools", Tab::Diamond));
-    vleft->add(new TabSeparator());
-    vleft->add(new Tab("Vanilla"));
-    vleft->add(new Tab("Gay sex"));
-    vleft->add(new Tab("Homosexual geckos"));
-    vleft->add(new Tab("Femboy Hooters"));
-    vleft->add(new Tab("Catgirls"));
-    vleft->add(new Pad(true));
-    vleft->add(new Tab("Settings", Tab::Diamond));
-    left->add(vleft);
-    layout->first(left);
+    sidebarTabs->add(labelPad);
 
-    auto right = new VerticalLayout();
-    for (int i = 0; i < 3; i++) {
-        right->add(new Label("my girlfriend has " + std::to_string(i) + " bones in her body"));
-    }
-    auto btn = new Button("Open Test Window");
-    btn->callback([](auto) -> void {
-        new TestWindow();
-    });
-    btn->bg(Style::primary());
-    right->add(btn);
-    auto cbox = new Checkbox("Test Checkbox Thing");
-    right->add(cbox);
-    layout->second(right);
+    sidebarTabs->add(new Tab("general"_id, "General", Tab::Diamond));
+    sidebarTabs->add(new Tab("advanced"_id, "Advanced", Tab::Diamond));
+    sidebarTabs->add(new Tab("tools"_id, "Tools", Tab::Diamond));
+    sidebarTabs->add(new TabSeparator());
+    sidebarTabs->add(new Tab("Vanilla"));
+    sidebarTabs->add(new Tab("Gay sex"));
+    sidebarTabs->add(new Tab("Homosexual geckos"));
+    sidebarTabs->add(new Tab("Femboy Hooters"));
+    sidebarTabs->add(new Tab("Catgirls"));
+    sidebarTabs->add(new Pad(true));
+    sidebarTabs->add(new Tab("Settings", Tab::Diamond));
+
+    sidebarBG->add(sidebarTabs);
+    layout->first(sidebarBG);
 
     layout->min(Tab::s_pad * 2 + Tab::s_dot);
     layout->max(400_px);

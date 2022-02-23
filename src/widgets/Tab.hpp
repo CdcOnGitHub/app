@@ -6,13 +6,18 @@
 class Tab;
 
 class Tabs : public Widget {
+public:
+    using SelectFunc = std::function<void(size_t)>;
+
 protected:
     std::vector<Tab*> m_tabs;
     Layout* m_layout;
+    SelectFunc m_func = nullptr;
 
 public:
     Tabs(Layout* l);
 
+    void onSelect(SelectFunc func);
     void add(Widget* w) override;
     void select(Tab* tab);
 };
@@ -34,10 +39,12 @@ protected:
     Color m_dotColor;
     Type m_type;
     Tabs* m_control = nullptr;
+    size_t m_id;
 
     friend class Tabs;
 
 public:
+    Tab(size_t id, std::string const& text, Type type = Type::Dot);
     Tab(std::string const& text, Type type = Type::Dot);
 
     void updateSize(HDC hdc, SIZE) override;
@@ -58,3 +65,7 @@ public:
     void updateSize(HDC hdc, SIZE) override;
     void paint(HDC hdc, PAINTSTRUCT* ps) override;
 };
+
+constexpr size_t operator"" _id(const char* str, size_t) {
+    return const_hash(str);
+}

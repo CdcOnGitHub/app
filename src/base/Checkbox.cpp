@@ -2,7 +2,7 @@
 #include "Button.hpp"
 
 Checkbox::Checkbox(std::string const& text, bool checked) {
-    m_type = "Checkbox";
+    m_typeName = "Checkbox";
     this->check(checked);
     this->text(text);
     this->font("Segoe UI");

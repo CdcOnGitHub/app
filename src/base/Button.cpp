@@ -3,7 +3,7 @@
 int Button::s_rounding = 2_px;
 
 Button::Button(std::string const& text) {
-    m_type = "Button";
+    m_typeName = "Button";
     this->text(text);
     this->font("Segoe UI");
     this->color(Style::text());

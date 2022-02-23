@@ -5,7 +5,7 @@ Widget* Widget::s_hoveredWidget = nullptr;
 Widget* Widget::s_capturingWidget = nullptr;
 
 const char* Widget::type() const {
-    return m_type;
+    return m_typeName;
 }
 
 void Widget::captureMouse() {
@@ -39,6 +39,13 @@ void Widget::remove(Widget* child, bool release) {
         }
     }
     m_children.erase(std::remove(m_children.begin(), m_children.end(), child), m_children.end());
+}
+
+void Widget::clear() {
+    for (auto& widget : m_children) {
+        delete widget;
+    }
+    m_children.clear();
 }
 
 void Widget::setWindow(Window* window) {

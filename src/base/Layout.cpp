@@ -1,19 +1,19 @@
 #include "Layout.hpp"
 
 Pad::Pad(bool exp) {
-    m_type = "Pad";
+    m_typeName = "Pad";
     m_expand = exp;
     this->show();
 }
 
 Pad::Pad(int size) {
-    m_type = "Pad";
+    m_typeName = "Pad";
     this->resize(size);
     this->show();
 }
 
 Pad::Pad() {
-    m_type = "Pad";
+    m_typeName = "Pad";
     this->show();
 }
 
@@ -50,6 +50,14 @@ void PadWidget::add(Widget* child) {
     }
 }
 
+void PadWidget::remove(Widget* child, bool release) {
+    m_widget->remove(child, release);
+}
+
+void PadWidget::clear() {
+    m_widget->clear();
+}
+
 void PadWidget::pad(int size) {
     m_pad = size;
     m_widget->move(m_pad, m_pad);
@@ -78,7 +86,7 @@ void Layout::pad(int p) {
 }
 
 HorizontalLayout::HorizontalLayout() {
-    m_type = "HorizontalLayout";
+    m_typeName = "HorizontalLayout";
     this->autoResize();
     this->show();
 }
@@ -142,7 +150,7 @@ void HorizontalLayout::updateSize(HDC hdc, SIZE available) {
 }
 
 VerticalLayout::VerticalLayout() {
-    m_type = "VerticalLayout";
+    m_typeName = "VerticalLayout";
     this->autoResize();
     this->show();
 }
@@ -206,7 +214,7 @@ void VerticalLayout::updateSize(HDC hdc, SIZE available) {
 }
 
 ResizeGrip::ResizeGrip(SplitLayout* l) {
-    m_type = "ResizeGrip";
+    m_typeName = "ResizeGrip";
     m_layout = l;
     this->show();
 }
@@ -291,7 +299,7 @@ void ResizeGrip::hideLine() {
 }
 
 SplitLayout::SplitLayout() {
-    m_type = "SplitLayout";
+    m_typeName = "SplitLayout";
     m_separator = new ResizeGrip(this);
     this->add(m_separator);
     this->show();

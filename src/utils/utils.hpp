@@ -28,3 +28,7 @@ namespace color {
     Color alpha(Color const& color, BYTE newAlpha);
     Color alpha(Color const& color, int newAlpha);
 }
+
+constexpr size_t const_hash(const char* input) {
+    return *input ? static_cast<size_t>(*input) + 33 * const_hash(input + 1) : 5381;
+}

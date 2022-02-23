@@ -29,7 +29,7 @@ protected:
     std::vector<Widget*> m_children;
     std::unordered_map<COLORREF, HBRUSH> m_brushes;
     std::unordered_map<std::string, HPEN> m_pens;
-    const char* m_type = "Widget";
+    const char* m_typeName = "Widget";
     static Widget* s_hoveredWidget;
     static Widget* s_capturingWidget;
 
@@ -54,6 +54,7 @@ public:
 
     virtual void add(Widget* child);
     virtual void remove(Widget* child, bool release = true);
+    virtual void clear();
     virtual void resize(int width, int height);
     virtual void autoResize();
     virtual void move(int x, int y);

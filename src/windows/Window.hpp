@@ -14,7 +14,7 @@ protected:
     int m_tabIndex = 0;
 
 public:
-    Window(std::string const& title, int width = 600, int height = 400);
+    Window(std::string const& title, int width = 600_px, int height = 400_px);
     Window() = delete;
     virtual ~Window();
 
