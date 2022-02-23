@@ -42,6 +42,10 @@ PadWidget::PadWidget(int size) : PadWidget(size, new HorizontalLayout()) {}
 
 PadWidget::PadWidget() : PadWidget(0, new HorizontalLayout()) {}
 
+Widget* PadWidget::widget() const {
+    return m_widget;
+}
+
 void PadWidget::add(Widget* child) {
     if (child == m_widget) {
         Widget::add(child);
@@ -105,6 +109,16 @@ void HorizontalLayout::remove(Widget* child, bool release) {
     Widget::remove(child, release);
 }
 
+void HorizontalLayout::fill(bool on) {
+    m_fill = on;
+    this->update();
+}
+
+void HorizontalLayout::align(Align defaultAlign) {
+    m_defaultAlign = defaultAlign;
+    this->update();
+}
+
 void HorizontalLayout::updateSize(HDC hdc, SIZE available) {
     int widths = 0;
     int height = 0;
@@ -127,18 +141,20 @@ void HorizontalLayout::updateSize(HDC hdc, SIZE available) {
     widths -= m_pad;
     if (m_autoresize) {
         m_width = availableWidth;
-        m_height = height;
+        m_height = m_fill ? available.cy : height;
     }
     int pos = 0;
     for (auto& child : m_children) {
         if (!child->visible()) continue;
         auto ypos = 0;
+        auto alignment = m_defaultAlign;
         if (m_alignments.count(child)) {
-            switch (m_alignments[child]) {
-                // case Align::Start: ypos = 0; break;
-                case Align::Middle: ypos = (m_height - child->height()) / 2; break;
-                case Align::End: ypos = m_height - child->height(); break;
-            }
+            alignment = m_alignments[child];
+        }
+        switch (alignment) {
+            case Align::Start: ypos = 0; break;
+            case Align::Middle: ypos = (m_height - child->height()) / 2; break;
+            case Align::End: ypos = m_height - child->height(); break;
         }
         child->move(pos, ypos);
         auto pad = dynamic_cast<Pad*>(child);
@@ -169,6 +185,16 @@ void VerticalLayout::remove(Widget* child, bool release) {
     Widget::remove(child, release);
 }
 
+void VerticalLayout::fill(bool on) {
+    m_fill = on;
+    this->update();
+}
+
+void VerticalLayout::align(Align defaultAlign) {
+    m_defaultAlign = defaultAlign;
+    this->update();
+}
+
 void VerticalLayout::updateSize(HDC hdc, SIZE available) {
     int heights = 0;
     int width = 0;
@@ -190,19 +216,21 @@ void VerticalLayout::updateSize(HDC hdc, SIZE available) {
     }
     heights -= m_pad;
     if (m_autoresize) {
-        m_width = width;
+        m_width = m_fill ? available.cx : width;
         m_height = availableHeight;
     }
     int pos = 0;
     for (auto& child : m_children) {
         if (!child->visible()) continue;
         auto xpos = 0;
+        auto alignment = m_defaultAlign;
         if (m_alignments.count(child)) {
-            switch (m_alignments[child]) {
-                // case Align::Start: xpos = 0; break;
-                case Align::Middle: xpos = (m_width - child->width()) / 2; break;
-                case Align::End: xpos = m_width - child->width(); break;
-            }
+            alignment = m_alignments[child];
+        }
+        switch (alignment) {
+            case Align::Start: xpos = 0; break;
+            case Align::Middle: xpos = (m_width - child->width()) / 2; break;
+            case Align::End: xpos = m_width - child->width(); break;
         }
         child->move(xpos, pos);
         auto pad = dynamic_cast<Pad*>(child);

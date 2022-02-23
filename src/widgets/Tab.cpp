@@ -2,9 +2,9 @@
 #include <array>
 
 int Tab::s_pad = 15_px;
-int Tab::s_height = 36_px;
-int Tab::s_dot = 10_px;
-int Tab::s_arrow = 10_px;
+int Tab::s_height = 32_px;
+int Tab::s_dot = 9_px;
+int Tab::s_arrow = 9_px;
 
 void Tabs::add(Widget* w) {
     if (w == m_layout) Widget::add(w);
@@ -105,6 +105,17 @@ Color Tab::dot() {
     return s[ix];
 }
 
+void Tab::arrow(bool a) {
+    m_arrow = a;
+    this->update();
+}
+
+void Tab::makeButton(bool b) {
+    m_button = b;
+    m_arrow = !b;
+    this->update();
+}
+
 void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto fullRect = this->rect();
     auto r = fullRect;
@@ -149,7 +160,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
     f.SetFormatFlags(StringFormatFlagsNoFitBlackBox);
-    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize));
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize, m_style));
     SolidBrush brush(color::alpha(m_color, m_hovered || m_selected ? 255 : 125));
     FontFamily family;
     font.GetFamily(&family);
@@ -164,39 +175,59 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
         },
         &f, &brush
     );
+    
+    switch (m_type) {
+        case Type::Diamond: {
+            SolidBrush diamondBrush(
+                color::alpha(Style::text(), 80)
+            );
+            auto dh = static_cast<int>(sqrtf(
+                powf(static_cast<float>(Tab::s_dot), 2) * 2.f)
+            );
+            PointF center(
+                r.X + Tab::s_dot / 2.f,
+                r.Y + (s_height - dh) / 2.f
+            );
+            g.TranslateTransform(center.X, center.Y);
+            g.RotateTransform(45.f);
+            g.FillRectangle(
+                &diamondBrush,
+                Rect { 0, 0, s_dot, s_dot }
+            );
+            g.RotateTransform(-45.f);
+            g.TranslateTransform(-center.X, -center.Y);
+        } break;
 
-    if (m_type == Type::Diamond) {
-        SolidBrush diamondBrush(
-            color::alpha(Style::text(), 80)
-        );
-        auto dh = static_cast<int>(sqrtf(
-            powf(static_cast<float>(Tab::s_dot), 2) * 2.f)
-        );
-        PointF center(
-            r.X + Tab::s_dot / 2.f,
-            r.Y + (s_height - dh) / 2.f
-        );
-        g.TranslateTransform(center.X, center.Y);
-        g.RotateTransform(45.f);
-        g.FillRectangle(
-            &diamondBrush,
-            Rect { 0, 0, s_dot, s_dot }
-        );
-        g.RotateTransform(-45.f);
-        g.TranslateTransform(-center.X, -center.Y);
-    } else {
-        SolidBrush dotBrush(m_dotColor);
-        g.FillEllipse(
-            &dotBrush,
-            Rect {
-                r.X,
-                r.Y + (s_height - Tab::s_dot) / 2,
-                Tab::s_dot, Tab::s_dot
-            }
-        );
+        case Type::Plus: {
+            Pen pen(color::alpha(Style::text(), 80), m_fontSize / 8.f);
+            GraphicsPath path;
+            auto pad = (s_height - s_arrow) / 2;
+            path.AddLine(
+                r.X + Tab::s_dot / 2, r.Y + (s_height - Tab::s_dot) / 2,
+                r.X + Tab::s_dot / 2, r.Y + (s_height + Tab::s_dot) / 2
+            );
+            path.StartFigure();
+            path.AddLine(
+                r.X, r.Y + s_height / 2,
+                r.X + Tab::s_dot, r.Y + s_height / 2
+            );
+            g.DrawPath(&pen, &path);
+        } break;
+
+        default: {
+            SolidBrush dotBrush(m_dotColor);
+            g.FillEllipse(
+                &dotBrush,
+                Rect {
+                    r.X,
+                    r.Y + (s_height - Tab::s_dot) / 2,
+                    Tab::s_dot, Tab::s_dot
+                }
+            );
+        } break;
     }
 
-    if ((m_hovered || m_selected) && m_width > s_pad * 2 + s_dot + s_arrow * 2) {
+    if (m_arrow && (m_hovered || m_selected) && m_width > s_pad * 2 + s_dot + s_arrow * 2) {
         Pen pen(Style::text(), m_fontSize / 8.f);
         GraphicsPath path;
         auto pad = (s_height - s_arrow) / 2;
@@ -223,7 +254,7 @@ HCURSOR Tab::cursor() const {
 }
 
 void Tab::click() {
-    if (m_control) {
+    if (!m_button && m_control) {
         m_control->select(this);
     }
 }

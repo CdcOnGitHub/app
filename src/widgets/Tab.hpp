@@ -32,10 +32,13 @@ public:
     enum Type {
         Diamond,
         Dot,
+        Plus,
     };
 
 protected:
     bool m_selected = false;
+    bool m_arrow = true;
+    bool m_button = false;
     Color m_dotColor;
     Type m_type;
     Tabs* m_control = nullptr;
@@ -53,6 +56,8 @@ public:
     bool wantsMouse() const override;
     HCURSOR cursor() const;
 
+    void makeButton(bool b);
+    void arrow(bool a);
     static Color dot();
 
     void click() override;

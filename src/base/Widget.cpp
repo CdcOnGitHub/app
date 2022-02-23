@@ -4,6 +4,14 @@
 Widget* Widget::s_hoveredWidget = nullptr;
 Widget* Widget::s_capturingWidget = nullptr;
 
+void Widget::userData(void* data) {
+    m_userData = data;
+}
+
+void* Widget::userData() const {
+    return m_userData;
+}
+
 const char* Widget::type() const {
     return m_typeName;
 }
@@ -293,6 +301,7 @@ std::string TextWidget::text() const {
 void TextWidget::font(std::string const& font, int size) {
     m_font = font;
     m_fontSize = size;
+    this->update();
 }
 
 void TextWidget::font(std::string const& font) {
@@ -305,4 +314,63 @@ void TextWidget::fontSize(int size) {
 
 void TextWidget::wrap(bool on) {
     m_wordWrap = on;
+    this->update();
+}
+
+void TextWidget::style(int style) {
+    m_style = style;
+    this->update();
+}
+
+RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const& format) {
+    Graphics g(hdc);
+    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    RectF r;
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize, m_style));
+    if (m_wordWrap) {
+        g.MeasureString(
+            toWString(m_text).c_str(), -1,
+            &font, { 
+                0, 0,
+                static_cast<REAL>(available.cx),
+                static_cast<REAL>(available.cy)
+            }, &format, &r
+        );
+    } else {
+        g.MeasureString(
+            toWString(m_text).c_str(), -1,
+            &font, { 
+                0, 0, 0, 0
+            }, &format, &r
+        );
+    }
+    if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
+    if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
+    return r;
+}
+
+void TextWidget::paintText(HDC hdc, Rect const& drawRect, StringFormat const& format) {
+    Graphics g(hdc);
+    g.SetSmoothingMode(SmoothingModeAntiAlias);
+
+    Font font(hdc, Manager::get()->loadFont(m_font, m_fontSize, m_style));
+    SolidBrush brush(m_color);
+    if (m_wordWrap) {
+        g.DrawString(
+            toWString(m_text).c_str(), -1,
+            &font, toRectF(drawRect), &format, &brush
+        );
+    } else {
+        Region reg(drawRect);
+        g.SetClip(&reg);
+        g.DrawString(
+            toWString(m_text).c_str(), -1,
+            &font, toPointF(drawRect), &format, &brush
+        );
+    }
+}
+
+void TextWidget::paint(HDC hdc, PAINTSTRUCT* ps) {
+    this->paintText(hdc, this->rect());
+    Widget::paint(hdc, ps);
 }

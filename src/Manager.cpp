@@ -97,12 +97,15 @@ std::string Manager::fontFaceID(std::string const& font, int size) {
     return font + std::to_string(size);
 }
 
-HFONT Manager::loadFont(std::string const& face, int size) {
+HFONT Manager::loadFont(std::string const& face, int size, int style) {
     auto faceid = fontFaceID(face, size);
     if (m_fonts.count(faceid)) return m_fonts.at(faceid);
     auto font = CreateFontA(
         size,
-        0, 0, 0, FW_NORMAL, false, false, false, 
+        0, 0, 0, (style & FontStyleBold ? FW_BOLD : FW_NORMAL),
+        style & FontStyleItalic,
+        style & FontStyleUnderline,
+        style & FontStyleStrikeout, 
         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, 
         CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
         DEFAULT_PITCH, face.c_str()

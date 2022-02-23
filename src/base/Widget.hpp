@@ -30,6 +30,7 @@ protected:
     std::unordered_map<COLORREF, HBRUSH> m_brushes;
     std::unordered_map<std::string, HPEN> m_pens;
     const char* m_typeName = "Widget";
+    void* m_userData = nullptr;
     static Widget* s_hoveredWidget;
     static Widget* s_capturingWidget;
 
@@ -72,6 +73,9 @@ public:
     virtual void mouseMove(int x, int y);
     virtual bool wantsMouse() const;
     virtual const char* type() const;
+    
+    void userData(void*);
+    void* userData() const;
 
     int x() const;
     int y() const;
@@ -101,13 +105,20 @@ protected:
     std::string m_font;
     int m_fontSize = 20_px;
     bool m_wordWrap = true;
+    int m_style = 0;
+
+    RectF measureText(HDC hdc, SIZE const& available, StringFormat const& format = StringFormat());
+    void paintText(HDC hdc, Rect const& drawRect, StringFormat const& format = StringFormat());
 
 public:
     virtual void text(std::string const& text);
     std::string text() const;
 
+    void paint(HDC hdc, PAINTSTRUCT* ps) override;
+
     void font(std::string const& font);
     virtual void font(std::string const& font, int size);
     virtual void fontSize(int size = 20);
     void wrap(bool);
+    void style(int style);
 };

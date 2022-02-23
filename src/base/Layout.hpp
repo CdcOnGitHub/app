@@ -31,6 +31,8 @@ public:
     void pad(int size);
     int pad() const;
 
+    Widget* widget() const;
+
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
     void remove(Widget* child, bool release = true) override;
@@ -55,11 +57,15 @@ public:
     };
 
 protected:
+    bool m_fill = false;
+    Align m_defaultAlign = Align::Start;
     std::unordered_map<Widget*, Align> m_alignments;
 
 public:
     HorizontalLayout();
 
+    void fill(bool on = true);
+    void align(Align defaultAlign);
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
     void add(Widget* child, Align alignment);
@@ -75,11 +81,15 @@ public:
     };
 
 protected:
+    bool m_fill = false;
+    Align m_defaultAlign = Align::Start;
     std::unordered_map<Widget*, Align> m_alignments;
 
 public:
     VerticalLayout();
 
+    void fill(bool on = true);
+    void align(Align defaultAlign);
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
     void add(Widget* child, Align alignment);

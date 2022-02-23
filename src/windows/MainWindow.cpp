@@ -5,6 +5,7 @@
 #include <Checkbox.hpp>
 #include <Tab.hpp>
 #include "TestWindow.hpp"
+#include <Context.hpp>
 
 void MainWindow::onTab(size_t id) {
     m_page->clear();
@@ -14,9 +15,25 @@ void MainWindow::onTab(size_t id) {
             m_page->add(label);
         } break;
 
-        case "advanced"_id: {
-            auto label = new Label("Advanced:tm:");
+        case "tools"_id: {
+            auto label = new Label("Tools:tm:");
             m_page->add(label);
+        } break;
+
+        case "settings"_id: {
+            auto title = new Label("Settings");
+            m_page->add(title);
+
+            auto button = new Button("Open Test Window");
+            button->bg(Style::primary());
+            button->callback([](auto) -> void { new TestWindow(); });
+            m_page->add(button);
+
+            auto lightMode = new Checkbox(
+                "Light Theme",
+                Manager::get()->theme() == Theme::Default::Light
+            );
+            m_page->add(lightMode);
         } break;
     }
 }
@@ -25,7 +42,10 @@ MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px
     auto layout = new SplitLayout();
     layout->hideSeparatorLine();
 
-    m_page = new PadWidget(Tab::s_pad, new VerticalLayout());
+    auto pageLayout = new VerticalLayout();
+    pageLayout->fill();
+    pageLayout->align(VerticalLayout::Middle);
+    m_page = new PadWidget(Tab::s_pad, pageLayout);
     layout->second(m_page);
 
     auto sidebarBG = new RectWidget();
@@ -43,16 +63,20 @@ MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px
     sidebarTabs->add(labelPad);
 
     sidebarTabs->add(new Tab("general"_id, "General", Tab::Diamond));
-    sidebarTabs->add(new Tab("advanced"_id, "Advanced", Tab::Diamond));
     sidebarTabs->add(new Tab("tools"_id, "Tools", Tab::Diamond));
     sidebarTabs->add(new TabSeparator());
-    sidebarTabs->add(new Tab("Vanilla"));
-    sidebarTabs->add(new Tab("Gay sex"));
-    sidebarTabs->add(new Tab("Homosexual geckos"));
-    sidebarTabs->add(new Tab("Femboy Hooters"));
-    sidebarTabs->add(new Tab("Catgirls"));
+
+    for (auto& c : Contexts::get()->all()) {
+        auto tab = new Tab(c->name());
+        tab->userData(c);
+        sidebarTabs->add(tab);
+    }
+    auto addContextTab = new Tab("New Context", Tab::Plus);
+    addContextTab->makeButton(true);
+    sidebarTabs->add(addContextTab);
+
     sidebarTabs->add(new Pad(true));
-    sidebarTabs->add(new Tab("Settings", Tab::Diamond));
+    sidebarTabs->add(new Tab("settings"_id, "Settings", Tab::Diamond));
 
     sidebarBG->add(sidebarTabs);
     layout->first(sidebarBG);

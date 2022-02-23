@@ -35,7 +35,7 @@ public:
 
     void run(Window* window);
 
-    HFONT loadFont(std::string const& font, int size = 0);
+    HFONT loadFont(std::string const& font, int size = 0, int style = 0);
 
     HMENU acquireMenuID();
     void relinquishMenuID(HMENU);
