@@ -369,6 +369,8 @@ RectF TextWidget::measureText(
 ) {
     Graphics g(hdc);
     g.SetSmoothingMode(SmoothingModeAntiAlias);
+    auto tf = format.Clone();
+    tf->SetFormatFlags(StringFormatFlagsMeasureTrailingSpaces);
     RectF r;
     Font font(hdc, Manager::get()->loadFont(fontFamily, fontSize, style));
     if (m_wordWrap) {
@@ -378,18 +380,19 @@ RectF TextWidget::measureText(
                 0, 0,
                 static_cast<REAL>(available.cx),
                 static_cast<REAL>(available.cy)
-            }, &format, &r
+            }, tf, &r
         );
     } else {
         g.MeasureString(
             text.c_str(), -1,
             &font, { 
                 0, 0, 0, 0
-            }, &format, &r
+            }, tf, &r
         );
     }
     if (r.Width > available.cx) r.Width = static_cast<REAL>(available.cx);
     if (r.Height > available.cy) r.Height = static_cast<REAL>(available.cy);
+    delete tf;
     return r;
 }
 

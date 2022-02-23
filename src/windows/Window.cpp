@@ -86,7 +86,7 @@ Window::Window(std::string const& title, bool hasParent, int width, int height) 
     wcex.hInstance      = Manager::get()->getInst();
     wcex.hIcon          = LoadIcon(wcex.hInstance, "applogo");
     wcex.hCursor        = LoadCursor(nullptr, IDC_ARROW);
-    wcex.hbrBackground  = (HBRUSH)GetStockObject(WHITE_BRUSH);
+    wcex.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
     wcex.lpszMenuName   = nullptr;
     wcex.lpszClassName  = className.c_str();
     wcex.hIconSm        = LoadIcon(wcex.hInstance, IDI_APPLICATION);
@@ -218,7 +218,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         } break;
 
         case WM_NCCALCSIZE: {
-            if (wp) {
+            if (Manager::get()->shouldWindowsBeBorderless() && wp) {
                 auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
                 pncsp->rgrc[0].left   = pncsp->rgrc[0].left   - EXTEND_SIDE;
                 pncsp->rgrc[0].right  = pncsp->rgrc[0].right  + EXTEND_SIDE;
@@ -228,20 +228,22 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         } break;
 
         case WM_ACTIVATE: {
-            MARGINS margins = { 0, 0, EXTEND_TOP, 0 };
-            DwmExtendFrameIntoClientArea(m_hwnd, &margins);
+            if (Manager::get()->shouldWindowsBeBorderless()) {
+                MARGINS margins = { 0, 0, EXTEND_TOP, 0 };
+                DwmExtendFrameIntoClientArea(m_hwnd, &margins);
 
-            HMODULE hUser = GetModuleHandleA("user32.dll");
-            if (hUser) {
-                pfnSetWindowCompositionAttribute setWindowCompositionAttribute =
-                    (pfnSetWindowCompositionAttribute)GetProcAddress(hUser, "SetWindowCompositionAttribute");
-                if (setWindowCompositionAttribute) {
-                    ACCENT_POLICY accent = { ACCENT_ENABLE_GRADIENT, 0, 0, 0 };
-                    WINDOWCOMPOSITIONATTRIBDATA data;
-                    data.Attrib = WCA_ACCENT_POLICY;
-                    data.pvData = &accent;
-                    data.cbData = sizeof(accent);
-                    setWindowCompositionAttribute(m_hwnd, &data);
+                HMODULE hUser = GetModuleHandleA("user32.dll");
+                if (hUser) {
+                    pfnSetWindowCompositionAttribute setWindowCompositionAttribute =
+                        (pfnSetWindowCompositionAttribute)GetProcAddress(hUser, "SetWindowCompositionAttribute");
+                    if (setWindowCompositionAttribute) {
+                        ACCENT_POLICY accent = { ACCENT_ENABLE_GRADIENT, 0, 0, 0 };
+                        WINDOWCOMPOSITIONATTRIBDATA data;
+                        data.Attrib = WCA_ACCENT_POLICY;
+                        data.pvData = &accent;
+                        data.cbData = sizeof(accent);
+                        setWindowCompositionAttribute(m_hwnd, &data);
+                    }
                 }
             }
         } break;
@@ -385,7 +387,7 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 if (wp == VK_ESCAPE) {
                     Widget::s_keyboardWidget = nullptr;
                 } else {
-                    Widget::s_keyboardWidget->keyDown(wp, LOBYTE(HIWORD(lp)));
+                    Widget::s_keyboardWidget->keyDown(wp, (lp >> 16) & 0x00ff);
                     return 0;
                 }
             }

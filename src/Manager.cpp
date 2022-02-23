@@ -139,6 +139,14 @@ void Manager::relinquishWindowClassID(int id) {
     m_classIDs.erase(id);
 }
 
+void Manager::borderlessWindows(bool b) {
+    m_borderlessWindows = b;
+}
+
+bool Manager::shouldWindowsBeBorderless() const {
+    return m_borderlessWindows;
+}
+
 void Manager::updateDPI(HWND hwnd) {
     auto hdc = GetDC(hwnd);
     m_dpi = GetDeviceCaps(hdc, LOGPIXELSX);

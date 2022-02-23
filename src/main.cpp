@@ -5,10 +5,10 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int) {
     Manager::setup(hInstance);
-    // try {
+    try {
         Manager::get()->run(new MainWindow());
-    // } catch(std::exception& e) {
-        // std::cout << e.what() << "\n";
-    // }
+    } catch(std::exception& e) {
+        std::cout << e.what() << "\n";
+    }
     return 0;
 }

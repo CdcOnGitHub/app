@@ -13,6 +13,7 @@ class Window;
 
 class Manager {
 protected:
+    bool m_borderlessWindows = false;
     HINSTANCE m_inst;
     Window* m_mainWindow = nullptr;
     std::unordered_map<std::wstring, HFONT> m_fonts;
@@ -45,6 +46,8 @@ public:
 
     Theme::Default theme();
     void setTheme(Theme::Default);
+    void borderlessWindows(bool b);
+    bool shouldWindowsBeBorderless() const;
 
     void save();
     void load();

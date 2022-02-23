@@ -5,13 +5,19 @@
 
 class Input : public TextWidget {
 protected:
-    size_t m_cursorPosition = 0;
+    size_t m_cursorStart = 0;
+    size_t m_cursorEnd = 0;
     size_t m_drawCharCount = 20;
     size_t m_drawLineCount = 1;
     std::wstring m_placeHolder = L"";
 
 public:
     Input();
+
+    void moveCursorBy(int pos);
+    void moveCursorTo(size_t pos);
+    size_t selected() const;
+    bool eraseSelection();
 
     bool wantsMouse() const override;
     HCURSOR cursor() const;
