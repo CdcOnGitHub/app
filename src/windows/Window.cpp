@@ -171,35 +171,78 @@ void Window::paint(HDC hdc, PAINTSTRUCT* ps) {
     Widget::paint(hdc, ps);
 }
 
+const int EXTEND_TOP = 40;
+const int EXTEND_SIDE = 8;
+
 LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
     switch (msg) {
-        // case WM_NCCALCSIZE: {
-        //     if (wp) {
-        //         auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
-        //         pncsp->rgrc[0].left   = pncsp->rgrc[0].left   + 8;
-        //         pncsp->rgrc[0].top    = pncsp->rgrc[0].top    + 0;
-        //         pncsp->rgrc[0].right  = pncsp->rgrc[0].right  - 8;
-        //         pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom - 8;
-        //         return 0;
-        //     }
-        // } break;
+        case WM_COMMAND: {
+            // wmId = LOWORD(wp);
+            // wmEvent = HIWORD(wp);
 
-        // case WM_ACTIVATE: {
-        //     MARGINS margins;
-        //     margins.cxLeftWidth = 0;
-        //     margins.cxRightWidth = 0;
-        //     margins.cyBottomHeight = 0;
-        //     margins.cyTopHeight = 40;
-        //     DwmExtendFrameIntoClientArea(m_hwnd, &margins);
-        // } break;
+            return DefWindowProc(m_hwnd, msg, wp, lp);
+        } break;
+
+        case WM_NCCALCSIZE: {
+            if (wp) {
+                auto pncsp = reinterpret_cast<NCCALCSIZE_PARAMS*>(lp);
+                pncsp->rgrc[0].left   = pncsp->rgrc[0].left   + EXTEND_SIDE;
+                pncsp->rgrc[0].right  = pncsp->rgrc[0].right  - EXTEND_SIDE;
+                pncsp->rgrc[0].bottom = pncsp->rgrc[0].bottom - EXTEND_SIDE;
+                return 0;
+            }
+        } break;
+
+        case WM_ACTIVATE: {
+            MARGINS margins;
+            margins.cxLeftWidth = EXTEND_SIDE;
+            margins.cxRightWidth = - EXTEND_SIDE;
+            margins.cyBottomHeight = - EXTEND_SIDE;
+            margins.cyTopHeight = EXTEND_TOP;
+            DwmExtendFrameIntoClientArea(m_hwnd, &margins);
+        } break;
 
         case WM_NCHITTEST: {
-            LRESULT hit = DefWindowProc(m_hwnd, msg, wp, lp);
             // if (this->isFullscreen()) return hit;
-            
-            POINT p;
-            p.x = GET_X_LPARAM(lp);
-            p.y = GET_Y_LPARAM(lp);
+            POINT p = { GET_X_LPARAM(lp), GET_Y_LPARAM(lp) };
+
+            LRESULT hit;
+            bool success = DwmDefWindowProc(m_hwnd, msg, wp, lp, &hit);
+
+            if (!success) {
+                RECT rcWindow;
+                GetWindowRect(m_hwnd, &rcWindow);
+
+                RECT rcFrame = { 0 };
+                AdjustWindowRectEx(&rcFrame, WS_OVERLAPPEDWINDOW & ~WS_CAPTION, FALSE, NULL);
+
+                USHORT uRow = 1;
+                USHORT uCol = 1;
+                bool fOnResizeBorder = false;
+
+                if (p.y >= rcWindow.top && p.y < rcWindow.top + EXTEND_SIDE) {
+                    fOnResizeBorder = p.y < (rcWindow.top - rcFrame.top);
+                    uRow = 0;
+                } else if (p.y < rcWindow.bottom && p.y >= rcWindow.bottom - EXTEND_SIDE) {
+                    uRow = 2;
+                }
+
+                if (p.x >= rcWindow.left && p.x < rcWindow.left + EXTEND_SIDE) {
+                    uCol = 0;
+                } else if (p.x < rcWindow.right && p.x >= rcWindow.right - EXTEND_SIDE) {
+                    uCol = 2;
+                }
+
+                LRESULT hitTests[3][3] = {
+                    { HTTOPLEFT, fOnResizeBorder ? HTTOP : HTCAPTION, HTTOPRIGHT },
+                    { HTLEFT, HTCLIENT, HTRIGHT },
+                    { HTBOTTOMLEFT, HTBOTTOM, HTBOTTOMRIGHT }
+                };
+
+                hit = hitTests[uRow][uCol];
+            }
+
+
             MapWindowPoints(nullptr, m_hwnd, &p, 1);
             if (Widget::s_capturingWidget) return hit;
             if (this->propagateCaptureMouse(toPoint(p))) return hit;
@@ -210,6 +253,17 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             return hit;
         } break;
 
+        case WM_SHOWWINDOW: {
+            RECT rcClient;
+            GetWindowRect(m_hwnd, &rcClient);
+
+            SetWindowPos(m_hwnd, NULL, 
+                rcClient.left, rcClient.top, 
+                rcClient.right - rcClient.left, 
+                rcClient.bottom - rcClient.top, 
+                SWP_FRAMECHANGED);
+        } break;
+        
         case WM_PAINT: {
             PAINTSTRUCT ps;
             auto hdc = BeginPaint(m_hwnd, &ps);
