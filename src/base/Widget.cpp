@@ -3,6 +3,7 @@
 
 Widget* Widget::s_hoveredWidget = nullptr;
 Widget* Widget::s_capturingWidget = nullptr;
+Widget* Widget::s_keyboardWidget = nullptr;
 
 void Widget::userData(void* data) {
     m_userData = data;
@@ -133,6 +134,9 @@ void Widget::mouseDown(int x, int y) {}
 void Widget::mouseUp(int x, int y) {
     this->click();
 }
+
+void Widget::keyDown(int key) {}
+void Widget::keyUp(int key) {}
 
 void Widget::tabEnter() {
     this->m_tabbed = true;

@@ -38,7 +38,7 @@ struct WINCOMPATTRDATA {
     ULONG ulSizeOfData;
 };
 
-Window::Window(std::string const& title, int width, int height) {
+Window::Window(std::string const& title, bool hasParent, int width, int height) {
     WNDCLASSEXA wcex;
 
     m_classID = Manager::get()->acquireWindowClassID();
@@ -61,14 +61,16 @@ Window::Window(std::string const& title, int width, int height) {
         throw std::runtime_error("Unable to register Window Class");
     }
 
+    auto parent = Manager::get()->getMainWindow();
+    if (hasParent) m_window = parent;
     HWND hwnd = CreateWindowExA(
         WS_EX_OVERLAPPEDWINDOW,
         className.c_str(),
         title.c_str(),
-        WS_OVERLAPPEDWINDOW | WS_EX_LAYERED,
+        WS_OVERLAPPEDWINDOW | (hasParent ? WS_POPUP : WS_EX_LAYERED),
         CW_USEDEFAULT, CW_USEDEFAULT,
         width, height,
-        nullptr,
+        (hasParent ? (parent ? parent->getHWND() : nullptr) : nullptr),
         nullptr,
         Manager::get()->getInst(),
         nullptr
@@ -91,6 +93,9 @@ Window::Window(std::string const& title, int width, int height) {
     this->show();
     this->center();
 }
+
+Window::Window(std::string const& title, int width, int height) :
+    Window(title, false, width, height) {}
 
 Window::~Window() {
     g_windows.erase(m_hwnd);
@@ -138,12 +143,19 @@ void Window::add(Widget* child) {
 }
 
 void Window::center() {
-    RECT rc;
-    GetWindowRect(m_hwnd, &rc);
-    this->move(
-        Manager::scale((GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2),
-        Manager::scale((GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2)
-    );
+    if (m_window) {
+        this->move(
+            m_window->x() + (m_window->width() - m_width) / 2,
+            m_window->y() + (m_window->height() - m_height) / 2
+        );
+    } else {
+        RECT rc;
+        GetWindowRect(m_hwnd, &rc);
+        this->move(
+            (GetSystemMetrics(SM_CXSCREEN) - rc.right) / 2,
+            (GetSystemMetrics(SM_CYSCREEN) - rc.bottom) / 2
+        );
+    }
 }
 
 bool Window::isFullscreen() const {
@@ -267,6 +279,14 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
         } break;
 
         case WM_KEYDOWN: {
+            if (Widget::s_keyboardWidget) {
+                if (wp == VK_ESCAPE) {
+                    Widget::s_keyboardWidget = nullptr;
+                } else {
+                    Widget::s_keyboardWidget->keyDown(wp);
+                    return 0;
+                }
+            }
             if (wp == VK_TAB) {
                 // todo: fix this mess
                 int index = 0;
@@ -282,6 +302,17 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
                 }
                 return 0;
             }
+        } break;
+
+        case WM_KEYUP: {
+            if (Widget::s_keyboardWidget) {
+                Widget::s_keyboardWidget->keyUp(wp);
+            }
+        } break;
+
+        case WM_MOVE: {
+            m_x = LOWORD(lp);
+            m_y = HIWORD(lp);
         } break;
 
         case WM_SIZE: {

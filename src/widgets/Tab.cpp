@@ -105,6 +105,10 @@ Color Tab::dot() {
     return s[ix];
 }
 
+void Tab::callback(Callback cb) {
+    m_callback = cb;
+}
+
 void Tab::arrow(bool a) {
     m_arrow = a;
     this->update();
@@ -254,6 +258,7 @@ HCURSOR Tab::cursor() const {
 }
 
 void Tab::click() {
+    if (m_callback) m_callback(this);
     if (!m_button && m_control) {
         m_control->select(this);
     }

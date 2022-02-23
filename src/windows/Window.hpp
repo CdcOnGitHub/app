@@ -14,7 +14,8 @@ protected:
     int m_tabIndex = 0;
 
 public:
-    Window(std::string const& title, int width = 600_px, int height = 400_px);
+    Window(std::string const& title, bool hasParent, int width = 600_px, int height = 400_px);
+    Window(std::string const& title = GEODEAPP_NAME, int width = 600_px, int height = 400_px);
     Window() = delete;
     virtual ~Window();
 

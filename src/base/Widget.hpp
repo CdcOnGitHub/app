@@ -33,6 +33,7 @@ protected:
     void* m_userData = nullptr;
     static Widget* s_hoveredWidget;
     static Widget* s_capturingWidget;
+    static Widget* s_keyboardWidget;
 
     void updatePosition();
     void setWindow(Window*);
@@ -41,6 +42,8 @@ protected:
     bool propagateCaptureMouse(Point& p);
     void captureMouse();
     void releaseMouse();
+    void captureKeyboard();
+    void releaseKeyboard();
 
     friend class Window;
 
@@ -72,6 +75,8 @@ public:
     virtual void mouseUp(int x, int y);
     virtual void mouseMove(int x, int y);
     virtual bool wantsMouse() const;
+    virtual void keyDown(int key);
+    virtual void keyUp(int key);
     virtual const char* type() const;
     
     void userData(void*);

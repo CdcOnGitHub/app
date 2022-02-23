@@ -6,6 +6,7 @@
 #include <Tab.hpp>
 #include "TestWindow.hpp"
 #include <Context.hpp>
+#include "CreateContextWindow.hpp"
 
 template<>
 void MainWindow::createTab<"general"_id>(VerticalLayout* page) {
@@ -103,6 +104,7 @@ MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px
     }
     auto addContextTab = new Tab("New Context", Tab::Plus);
     addContextTab->makeButton(true);
+    addContextTab->callback([](auto) -> void { new CreateContextWindow(); });
     sidebarTabs->add(addContextTab);
 
     sidebarTabs->add(new Pad(true));

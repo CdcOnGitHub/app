@@ -35,6 +35,8 @@ public:
         Plus,
     };
 
+    using Callback = std::function<void(Tab*)>;
+
 protected:
     bool m_selected = false;
     bool m_arrow = true;
@@ -43,6 +45,7 @@ protected:
     Type m_type;
     Tabs* m_control = nullptr;
     size_t m_id;
+    Callback m_callback = nullptr;
 
     friend class Tabs;
 
@@ -56,6 +59,7 @@ public:
     bool wantsMouse() const override;
     HCURSOR cursor() const;
 
+    void callback(Callback);
     void makeButton(bool b);
     void arrow(bool a);
     static Color dot();
