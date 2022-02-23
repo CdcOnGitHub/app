@@ -34,12 +34,12 @@ TestWindow::TestWindow() : Window("Test Window") {
     btn->move(80_px, 100_px);
     btn->font("Segoe UI", 18_px);
     btn->bg({ 111, 125, 170 });
-    btn->callback([](auto b) -> void { std::cout << "hello from " << b->text() << "\n"; });
+    btn->callback([](auto b) -> void { std::wcout << L"hello from " << b->text() << L"\n"; });
     this->add(btn);
 
     auto btn2 = new Button("Become GAY");
     btn2->move(380_px, 100_px);
     btn2->bg({ 170, 111, 152 });
-    btn2->callback([](auto b) -> void { std::cout << "GAY from " << b->text() << "\n"; });
+    btn2->callback([](auto b) -> void { std::wcout << L"GAY from " << b->text() << L"\n"; });
     this->add(btn2);
 }

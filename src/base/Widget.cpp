@@ -313,18 +313,31 @@ Color ColorWidget::color() const {
     return m_color;
 }
 
-void TextWidget::text(std::string const& text) {
-    this->m_text = text;
+void TextWidget::text(std::wstring const& text) {
+    m_text = text;
+    this->update();
 }
 
-std::string TextWidget::text() const {
+void TextWidget::text(std::string const& text) {
+    this->text(toWString(text));
+}
+
+std::wstring TextWidget::text() const {
     return m_text;
 }
 
-void TextWidget::font(std::string const& font, int size) {
+void TextWidget::font(std::wstring const& font, int size) {
     m_font = font;
     m_fontSize = size;
     this->update();
+}
+
+void TextWidget::font(std::string const& font, int size) {
+    this->font(toWString(font), size);
+}
+
+void TextWidget::font(std::wstring const& font) {
+    this->font(font, m_fontSize);
 }
 
 void TextWidget::font(std::string const& font) {
@@ -347,8 +360,8 @@ void TextWidget::style(int style) {
 
 RectF TextWidget::measureText(
     HDC hdc,
-    std::string const& text,
-    std::string const& fontFamily,
+    std::wstring const& text,
+    std::wstring const& fontFamily,
     int fontSize,
     int style,
     SIZE const& available,
@@ -360,7 +373,7 @@ RectF TextWidget::measureText(
     Font font(hdc, Manager::get()->loadFont(fontFamily, fontSize, style));
     if (m_wordWrap) {
         g.MeasureString(
-            toWString(text).c_str(), -1,
+            text.c_str(), -1,
             &font, { 
                 0, 0,
                 static_cast<REAL>(available.cx),
@@ -369,7 +382,7 @@ RectF TextWidget::measureText(
         );
     } else {
         g.MeasureString(
-            toWString(text).c_str(), -1,
+            text.c_str(), -1,
             &font, { 
                 0, 0, 0, 0
             }, &format, &r
@@ -382,7 +395,7 @@ RectF TextWidget::measureText(
 
 RectF TextWidget::measureText(
     HDC hdc,
-    std::string const& text,
+    std::wstring const& text,
     SIZE const& available,
     StringFormat const& format
 ) {
@@ -395,8 +408,8 @@ RectF TextWidget::measureText(HDC hdc, SIZE const& available, StringFormat const
 
 void TextWidget::paintText(
     HDC hdc,
-    std::string const& text,
-    std::string const& fontFamily,
+    std::wstring const& text,
+    std::wstring const& fontFamily,
     int fontSize,
     int style,
     Color const& color,
@@ -410,14 +423,14 @@ void TextWidget::paintText(
     SolidBrush brush(color);
     if (m_wordWrap) {
         g.DrawString(
-            toWString(text).c_str(), -1,
+            text.c_str(), -1,
             &font, toRectF(drawRect), &format, &brush
         );
     } else {
         Region reg(drawRect);
         g.SetClip(&reg);
         g.DrawString(
-            toWString(text).c_str(), -1,
+            text.c_str(), -1,
             &font, toPointF(drawRect), &format, &brush
         );
     }
@@ -425,7 +438,7 @@ void TextWidget::paintText(
 
 void TextWidget::paintText(
     HDC hdc,
-    std::string const& text,
+    std::wstring const& text,
     int style,
     Color const& color,
     Rect const& drawRect
@@ -435,7 +448,7 @@ void TextWidget::paintText(
 
 void TextWidget::paintText(
     HDC hdc,
-    std::string const& text,
+    std::wstring const& text,
     Rect const& drawRect,
     StringFormat const& format
 ) {

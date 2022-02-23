@@ -107,16 +107,16 @@ public:
 
 class TextWidget : public ColorWidget {
 protected:
-    std::string m_text;
-    std::string m_font;
+    std::wstring m_text;
+    std::wstring m_font;
     int m_fontSize = 20_px;
     bool m_wordWrap = true;
     int m_style = 0;
 
     RectF measureText(
         HDC hdc,
-        std::string const& text,
-        std::string const& font,
+        std::wstring const& text,
+        std::wstring const& font,
         int fontSize,
         int style,
         SIZE const& available,
@@ -124,7 +124,7 @@ protected:
     );
     RectF measureText(
         HDC hdc,
-        std::string const& text,
+        std::wstring const& text,
         SIZE const& available,
         StringFormat const& format
     );
@@ -132,8 +132,8 @@ protected:
 
     void paintText(
         HDC hdc,
-        std::string const& text,
-        std::string const& font,
+        std::wstring const& text,
+        std::wstring const& font,
         int fontSize,
         int style,
         Color const& color,
@@ -142,14 +142,14 @@ protected:
     );
     void paintText(
         HDC hdc,
-        std::string const& text,
+        std::wstring const& text,
         int style,
         Color const& color,
         Rect const& drawRect
     );
     void paintText(
         HDC hdc,
-        std::string const& text,
+        std::wstring const& text,
         Rect const& drawRect,
         StringFormat const& format
     );
@@ -157,12 +157,15 @@ protected:
 
 public:
     virtual void text(std::string const& text);
-    std::string text() const;
+    virtual void text(std::wstring const& text);
+    std::wstring text() const;
 
     void paint(HDC hdc, PAINTSTRUCT* ps) override;
 
     void font(std::string const& font);
+    void font(std::wstring const& font);
     virtual void font(std::string const& font, int size);
+    virtual void font(std::wstring const& font, int size);
     virtual void fontSize(int size = 20_px);
     void wrap(bool);
     void style(int style);

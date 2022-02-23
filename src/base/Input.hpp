@@ -8,7 +8,7 @@ protected:
     size_t m_cursorPosition = 0;
     size_t m_drawCharCount = 20;
     size_t m_drawLineCount = 1;
-    std::string m_placeHolder = "";
+    std::wstring m_placeHolder = L"";
 
 public:
     Input();
@@ -18,6 +18,7 @@ public:
     void click() override;
 
     void drawSize(size_t characters, size_t lines);
+    void placeHolder(std::wstring const& text);
     void placeHolder(std::string const& text);
     
     void keyDown(size_t key, size_t scanCode) override;

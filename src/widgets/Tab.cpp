@@ -169,7 +169,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     FontFamily family;
     font.GetFamily(&family);
     gt.DrawString(
-        toWString(m_text).c_str(), -1,
+        m_text.c_str(), -1,
         &font,
         RectF {
             static_cast<float>(tr.X),

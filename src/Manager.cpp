@@ -93,14 +93,14 @@ HINSTANCE Manager::getInst() const {
     return m_inst;
 }
 
-std::string Manager::fontFaceID(std::string const& font, int size) {
-    return font + std::to_string(size);
+std::wstring Manager::fontFaceID(std::wstring const& font, int size) {
+    return font + std::to_wstring(size);
 }
 
-HFONT Manager::loadFont(std::string const& face, int size, int style) {
+HFONT Manager::loadFont(std::wstring const& face, int size, int style) {
     auto faceid = fontFaceID(face, size);
     if (m_fonts.count(faceid)) return m_fonts.at(faceid);
-    auto font = CreateFontA(
+    auto font = CreateFontW(
         size,
         0, 0, 0, (style & FontStyleBold ? FW_BOLD : FW_NORMAL),
         style & FontStyleItalic,

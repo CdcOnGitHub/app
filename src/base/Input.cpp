@@ -8,9 +8,13 @@ Input::Input() {
     this->show();
 }
 
-void Input::placeHolder(std::string const& text) {
+void Input::placeHolder(std::wstring const& text) {
     m_placeHolder = text;
     this->update();
+}
+
+void Input::placeHolder(std::string const& text) {
+    this->placeHolder(toWString(text));
 }
 
 bool Input::wantsMouse() const {
@@ -29,9 +33,9 @@ void Input::drawSize(size_t characters, size_t lines) {
 
 void Input::updateSize(HDC hdc, SIZE available) {
     if (m_autoresize) {
-        std::string mtext = "";
+        std::wstring mtext = L"";
         for (size_t i = 0; i < m_drawLineCount; i++) {
-            mtext += std::string(m_drawCharCount, 'w') + '\n';
+            mtext += std::wstring(m_drawCharCount, 'w') + L'\n';
         }
         mtext.pop_back();
         auto r = this->measureText(hdc, mtext, available, StringFormat());

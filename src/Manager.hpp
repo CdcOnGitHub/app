@@ -15,7 +15,7 @@ class Manager {
 protected:
     HINSTANCE m_inst;
     Window* m_mainWindow = nullptr;
-    std::unordered_map<std::string, HFONT> m_fonts;
+    std::unordered_map<std::wstring, HFONT> m_fonts;
     std::unordered_map<LPTSTR, HCURSOR> m_cursors;
     std::unordered_set<HMENU> m_menuIDs;
     std::unordered_set<int> m_classIDs;
@@ -25,7 +25,7 @@ protected:
     ULONG_PTR m_gdiToken;
     Gdiplus::GdiplusStartupInput m_gdiStartupInput;
     
-    std::string fontFaceID(std::string const& font, int size);
+    std::wstring fontFaceID(std::wstring const& font, int size);
 
     Manager* setupManager(HINSTANCE inst);
 
@@ -35,7 +35,7 @@ public:
 
     void run(Window* window);
 
-    HFONT loadFont(std::string const& font, int size = 0, int style = 0);
+    HFONT loadFont(std::wstring const& font, int size = 0, int style = 0);
 
     HMENU acquireMenuID();
     void relinquishMenuID(HMENU);
