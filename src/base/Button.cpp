@@ -53,7 +53,6 @@ void Button::updateSize(HDC hdc, SIZE available) {
         this->resize(static_cast<int>(r.Width) + 30_px, static_cast<int>(r.Height) + 10_px);
         m_autoresize = true;
     }
-    m_resizeHandled = true;
     Widget::updateSize(hdc, available);
 }
 

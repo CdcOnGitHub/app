@@ -217,21 +217,12 @@ void Widget::update() {
 }
 
 void Widget::updateSize(HDC hdc, SIZE available) {
-    if (m_autoresize) {
-        SIZE to = (m_resizeHandled ? SIZE { m_width, m_height } : SIZE { 0, 0 });
-        for (auto& child : m_children) {
-            if (child->m_visible) {
-                child->updateSize(hdc, available);
-                auto childsupport = child->offset() + child->size();
-                if (childsupport.X > to.cx) to.cx = childsupport.X;
-                if (childsupport.Y > to.cy) to.cy = childsupport.Y;
-            }
-        }
-        this->resize(to.cx, to.cy);
-        m_autoresize = true;
-    } else {
-        for (auto& child : m_children) {
-            if (child->m_visible) child->updateSize(hdc, available);
+    for (auto& child : m_children) {
+        if (child->m_visible) {
+            auto av = available;
+            av.cx -= child->m_x;
+            av.cy -= child->m_y;
+            child->updateSize(hdc, av);
         }
     }
 }

@@ -40,8 +40,6 @@ protected:
     int m_pad = 0;
 
 public:
-    virtual void arrange(SIZE) = 0;
-
     void pad(int pad);
     void updateSize(HDC, SIZE) override;
 };
@@ -60,10 +58,10 @@ protected:
 public:
     HorizontalLayout();
 
+    void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
     void add(Widget* child, Align alignment);
     void remove(Widget* child, bool release = true) override;
-    void arrange(SIZE available) override;
 };
 
 class VerticalLayout : public Layout {
@@ -80,10 +78,10 @@ protected:
 public:
     VerticalLayout();
 
+    void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
     void add(Widget* child, Align alignment);
     void remove(Widget* child, bool release = true) override;
-    void arrange(SIZE available) override;
 };
 
 class SplitLayout;
@@ -138,7 +136,6 @@ public:
     SplitLayout();
 
     void setDirection(bool horizontal);
-    void arrange(SIZE available) override;
     void first(Widget* w);
     void second(Widget* w);
     Widget* first() const;

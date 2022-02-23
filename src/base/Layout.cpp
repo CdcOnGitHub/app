@@ -38,9 +38,9 @@ PadWidget::PadWidget(int size, Widget* widget) {
     this->show();
 }
 
-PadWidget::PadWidget(int size) : PadWidget(size, new Widget()) {}
+PadWidget::PadWidget(int size) : PadWidget(size, new HorizontalLayout()) {}
 
-PadWidget::PadWidget() : PadWidget(0, new Widget()) {}
+PadWidget::PadWidget() : PadWidget(0, new HorizontalLayout()) {}
 
 void PadWidget::add(Widget* child) {
     if (child == m_widget) {
@@ -65,12 +65,11 @@ void PadWidget::updateSize(HDC hdc, SIZE available) {
     available.cy -= m_pad * 2;
     Widget::updateSize(hdc, available);
     auto size = m_widget->size();
-    this->resize(size.Width + m_pad * 2, size.Height + m_pad);
+    this->resize(size.Width + m_pad * 2, size.Height + m_pad * 2);
 }
 
 void Layout::updateSize(HDC hdc, SIZE available) {
     Widget::updateSize(hdc, available);
-    this->arrange(available);
 }
 
 void Layout::pad(int p) {
@@ -98,14 +97,17 @@ void HorizontalLayout::remove(Widget* child, bool release) {
     Widget::remove(child, release);
 }
 
-void HorizontalLayout::arrange(SIZE available) {
+void HorizontalLayout::updateSize(HDC hdc, SIZE available) {
     int widths = 0;
     int height = 0;
     int pads = 0;
+    auto availableWidth = available.cx;
     for (auto& child : m_children) {
         if (!child->visible()) continue;
         auto pad = dynamic_cast<Pad*>(child);
         if (!pad || !pad->doesExpand()) {
+            child->updateSize(hdc, available);
+            available.cx -= child->width() + m_pad;
             widths += child->width() + m_pad;
             if (!pad && child->height() > height) {
                 height = child->height();
@@ -116,7 +118,7 @@ void HorizontalLayout::arrange(SIZE available) {
     }
     widths -= m_pad;
     if (m_autoresize) {
-        m_width = available.cx;
+        m_width = availableWidth;
         m_height = height;
     }
     int pos = 0;
@@ -159,14 +161,17 @@ void VerticalLayout::remove(Widget* child, bool release) {
     Widget::remove(child, release);
 }
 
-void VerticalLayout::arrange(SIZE available) {
+void VerticalLayout::updateSize(HDC hdc, SIZE available) {
     int heights = 0;
     int width = 0;
     int pads = 0;
+    auto availableHeight = available.cy;
     for (auto& child : m_children) {
         if (!child->visible()) continue;
         auto pad = dynamic_cast<Pad*>(child);
         if (!pad || !pad->doesExpand()) {
+            child->updateSize(hdc, available);
+            available.cy -= child->height() + m_pad;
             heights += child->height() + m_pad;
             if (!pad && child->width() > width) {
                 width = child->width();
@@ -178,7 +183,7 @@ void VerticalLayout::arrange(SIZE available) {
     heights -= m_pad;
     if (m_autoresize) {
         m_width = width;
-        m_height = available.cy;
+        m_height = availableHeight;
     }
     int pos = 0;
     for (auto& child : m_children) {
@@ -297,8 +302,6 @@ void SplitLayout::setDirection(bool h) {
     m_separator->direct(h);
     this->update();
 }
-
-void SplitLayout::arrange(SIZE available) {}
 
 void SplitLayout::first(Widget* w) {
     if (m_first) this->remove(m_first);

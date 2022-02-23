@@ -20,7 +20,6 @@ protected:
     int m_width = 0;
     int m_height = 0;
     bool m_autoresize = false;
-    bool m_resizeHandled = false;
     bool m_visible = false;
     bool m_hovered = false;
     bool m_mousedown = false;
