@@ -34,10 +34,25 @@ void MainWindow::createTab<"settings"_id>(VerticalLayout* page) {
     button->callback([](auto) -> void { new TestWindow(); });
     page->add(button);
 
+    auto lightModeInfoBG = new RectWidget();
+    lightModeInfoBG->color(color::alpha(Style::warning(), 155));
+    lightModeInfoBG->cornerRadius(10);
+    lightModeInfoBG->hide();
+
+    auto lightModeInfoPad = new PadWidget(Tab::s_pad);
+    lightModeInfoPad->add(new Label("You need to reload the app to apply this theme."));
+    lightModeInfoBG->add(lightModeInfoPad);
+
+    page->add(lightModeInfoBG);
+
     auto lightMode = new Checkbox(
         "Light Theme",
         Manager::get()->theme() == Theme::Default::Light
     );
+    lightMode->callback([lightModeInfoBG](auto b) -> void {
+        Manager::get()->setTheme(b->checked() ? Theme::Default::Light : Theme::Default::Dark);
+        lightModeInfoBG->show();
+    });
     page->add(lightMode);
 }
 
@@ -64,8 +79,11 @@ void MainWindow::onTab(size_t id) {
 }
 
 MainWindow::~MainWindow() {
+    auto old = m_page->widget(nullptr);
     for (auto& [_, p] : m_pages) {
-        delete p;
+        if (p != old) {
+            delete p;
+        }
     }
     m_page = nullptr;
 }
@@ -81,6 +99,7 @@ MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px
 
     auto sidebarBG = new RectWidget();
     sidebarBG->color(Style::sidebar());
+    sidebarBG->fill();
 
     auto sidebarTabs = new Tabs(new VerticalLayout());
     sidebarTabs->onSelect(std::bind(&MainWindow::onTab, this, std::placeholders::_1));

@@ -248,6 +248,14 @@ Widget* Widget::propagateMouseEvent(Point& p, bool down, int clickCount) {
     return ret;
 }
 
+void Widget::name(std::string const& name) {
+    m_name = name;
+}
+
+std::string const& Widget::name() {
+    return m_name;
+}
+
 void Widget::update() {
     if (m_window) {
         m_window->updateWindow();
@@ -288,12 +296,6 @@ std::vector<Widget*> Widget::getChildren() const {
 }
 
 Widget::~Widget() {
-    for (auto [_, b] : m_brushes) {
-        DeleteObject(b);
-    }
-    for (auto [_, b] : m_pens) {
-        DeleteObject(b);
-    }
     for (auto& child : m_children) {
         delete child;
     }

@@ -20,6 +20,8 @@ struct Theme {
     Color m_selectedTab;
     Color m_dark;
     Color m_inputBG;
+    Color m_warning;
+    Color m_error;
 
     enum class Default {
         Light, Dark,
@@ -48,6 +50,8 @@ public:
     DEF_THEME_GETTER(selectedTab);
     DEF_THEME_GETTER(dark);
     DEF_THEME_GETTER(inputBG);
+    DEF_THEME_GETTER(warning);
+    DEF_THEME_GETTER(error);
 
     static Style* current();
     void load(Theme const& theme);

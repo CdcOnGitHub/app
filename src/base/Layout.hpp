@@ -32,7 +32,7 @@ public:
     int pad() const;
 
     Widget* widget() const;
-    void widget(Widget* other, bool releaseOld = true);
+    Widget* widget(Widget* other, bool releaseOld = true);
 
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;

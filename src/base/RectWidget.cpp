@@ -7,16 +7,37 @@ RectWidget::RectWidget() {
     this->show();
 }
 
-void RectWidget::setCornerRadius(int c) {
+void RectWidget::fill(bool b) {
+    m_fill = b;
+    this->update();
+}
+
+void RectWidget::cornerRadius(int c) {
     m_cornerRadius = c;
     this->update();
 }
 
 void RectWidget::updateSize(HDC hdc, SIZE available) {
-    Widget::updateSize(hdc, available);
     if (m_autoresize) {
-        this->resize(available.cx, available.cy);
+        if (m_fill) {
+            this->resize(available.cx, available.cy);
+            Widget::updateSize(hdc, available);
+        } else {
+            Widget::updateSize(hdc, available);
+            SIZE size = { 0, 0 };
+            for (auto& child : m_children) {
+                if (child->x() + child->width() > size.cx) {
+                    size.cx = child->x() + child->width();
+                }
+                if (child->y() + child->height() > size.cy) {
+                    size.cy = child->y() + child->height();
+                }
+            }
+            this->resize(size.cx, size.cy);
+        }
         m_autoresize = true;
+    } else {
+        Widget::updateSize(hdc, available);
     }
 }
 

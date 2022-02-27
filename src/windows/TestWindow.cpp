@@ -13,7 +13,7 @@ TestWindow::TestWindow() : Window("Test Window") {
     rect2->move(250_px, 200_px);
     rect2->resize(90_px, 60_px);
     rect2->color({ 180, 120, 80 });
-    rect2->setCornerRadius(20_px);
+    rect2->cornerRadius(20_px);
     this->add(rect2);
 
     auto rect = new RectWidget();

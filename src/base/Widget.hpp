@@ -28,9 +28,8 @@ protected:
     Widget* m_parent = nullptr;
     Window* m_window = nullptr;
     std::vector<Widget*> m_children;
-    std::unordered_map<COLORREF, HBRUSH> m_brushes;
-    std::unordered_map<std::string, HPEN> m_pens;
     const char* m_typeName = "Widget";
+    std::string m_name = "";
     void* m_userData = nullptr;
     static Widget* s_hoveredWidget;
     static Widget* s_capturingWidget;
@@ -79,6 +78,8 @@ public:
     virtual void keyDown(size_t key, size_t scanCode);
     virtual void keyUp(size_t key, size_t scanCode);
     virtual const char* type() const;
+    void name(std::string const& name);
+    std::string const& name();
     
     void userData(void*);
     void* userData() const;

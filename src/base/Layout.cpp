@@ -43,7 +43,8 @@ Widget* PadWidget::widget() const {
     return m_widget;
 }
 
-void PadWidget::widget(Widget* other, bool releaseOld) {
+Widget* PadWidget::widget(Widget* other, bool releaseOld) {
+    auto old = m_widget;
     if (m_widget) {
         this->remove(m_widget, releaseOld);
     }
@@ -54,6 +55,7 @@ void PadWidget::widget(Widget* other, bool releaseOld) {
         this->add(m_widget);
         this->pad(m_pad);
     }
+    return old;
 }
 
 void PadWidget::add(Widget* child) {

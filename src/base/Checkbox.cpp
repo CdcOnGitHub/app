@@ -85,8 +85,8 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     );
 
     if (m_checked) {
-        constexpr const auto p = 5;
-        constexpr const auto t = 3;
+        const auto p = 4_px;
+        const auto t = 3;
         auto w = cr.Height - 2 * p;
         auto wt = w / t;
         auto wh = (t - 1) * wt;
