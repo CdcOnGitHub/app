@@ -7,6 +7,7 @@
 //
 
 #import "GeodeManageVC.h"
+#import "AppDelegate.h"
 
 @interface GeodeManageVC ()
 
@@ -15,7 +16,7 @@
 @implementation GeodeManageVC
 
 - (NSArray*)logs {
-    NSString* sourcePath = [self.geodePath stringByAppendingPathComponent: @"Contents/geode/log"];
+    NSString* sourcePath = [self.ctx.installPath stringByAppendingPathComponent: @"Contents/geode/log"];
 
     NSArray* dirs = [[NSFileManager defaultManager] contentsOfDirectoryAtPath:sourcePath
                                                                         error:NULL];
@@ -87,6 +88,19 @@
 
 - (void)openLog:(id)nid {
     [[NSWorkspace sharedWorkspace] openFile:self.logs[self.logTable.selectedRow] withApplication:@"Console"];
+}
+- (IBAction)promptDestroy:(id)sender {
+    NSAlert *alert = [[NSAlert alloc] init];
+    [alert addButtonWithTitle:@"Cancel"];
+    [alert addButtonWithTitle:@"Delete"];
+    [alert setMessageText:@"Delete the context?"];
+    [alert setInformativeText:@"Are you sure you would like to delete this context?"];
+    [alert setAlertStyle:NSWarningAlertStyle];
+    if ([alert runModal] == NSAlertSecondButtonReturn) {
+        [NSAppDel removeContext:self.ctx];
+        [self dismissController:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"ReloadContexts" object:self];
+    }
 }
 
 @end

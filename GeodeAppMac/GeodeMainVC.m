@@ -76,8 +76,8 @@
 }
 - (IBAction)openContext:(id)sender {
     GeodeManageVC* v = (GeodeManageVC*)[[NSStoryboard storyboardWithName:@"Main" bundle:[NSBundle mainBundle]] instantiateControllerWithIdentifier:@"manageVc"];
-    
-    [v setGeodePath: [[NSAppDel.contextList objectAtIndex: self.ContextTable.selectedRow] installPath]];
+
+    [v setCtx:[NSAppDel.contextList objectAtIndex: self.ContextTable.selectedRow]];
     
     [self presentViewControllerAsSheet:v];
 }

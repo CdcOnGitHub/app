@@ -93,6 +93,11 @@
     return newCtx;
 }
 
+- (void)removeContext:(ContextStub*)c {
+    [NSAppDel.managedObjectContext deleteObject:c];
+    [NSAppDel refreshContexts];
+}
+
 
  #pragma mark - Application's Documents directory
 

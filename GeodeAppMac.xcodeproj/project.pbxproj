@@ -14,6 +14,8 @@
 		AF82A80627BBF336004DA68E /* ContextStub.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80527BBF336004DA68E /* ContextStub.m */; };
 		AF82A80B27BD2998004DA68E /* GeodeManageVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80A27BD2998004DA68E /* GeodeManageVC.m */; };
 		AF82A80E27BFC8E5004DA68E /* GeodeVersionVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */; };
+		AF82A81727C4B4B1004DA68E /* libgeode.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = AF82A81627C4B4B1004DA68E /* libgeode.dylib */; };
+		AF82A81827C4B4C9004DA68E /* libgeode.dylib in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = AF82A81627C4B4B1004DA68E /* libgeode.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		AFB354A327AC89D8006A4958 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB354A227AC89D8006A4958 /* AppDelegate.m */; };
 		AFB354A627AC89D8006A4958 /* GeodeInstallVC.m in Sources */ = {isa = PBXBuildFile; fileRef = AFB354A527AC89D8006A4958 /* GeodeInstallVC.m */; };
 		AFB354A827AC89D9006A4958 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AFB354A727AC89D9006A4958 /* Assets.xcassets */; };
@@ -30,6 +32,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				AF82A81827C4B4C9004DA68E /* libgeode.dylib in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -50,6 +53,8 @@
 		AF82A80A27BD2998004DA68E /* GeodeManageVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeodeManageVC.m; sourceTree = "<group>"; };
 		AF82A80C27BFC8E5004DA68E /* GeodeVersionVC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeodeVersionVC.h; sourceTree = "<group>"; };
 		AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GeodeVersionVC.m; sourceTree = "<group>"; };
+		AF82A81427C4ABF2004DA68E /* libgeode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = libgeode.h; sourceTree = "<group>"; };
+		AF82A81627C4B4B1004DA68E /* libgeode.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; path = libgeode.dylib; sourceTree = "<group>"; };
 		AFB3549E27AC89D8006A4958 /* GeodeAppMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GeodeAppMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AFB354A127AC89D8006A4958 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		AFB354A227AC89D8006A4958 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -69,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AF82A81727C4B4B1004DA68E /* libgeode.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -94,6 +100,7 @@
 		AFB354A027AC89D8006A4958 /* GeodeAppMac */ = {
 			isa = PBXGroup;
 			children = (
+				AF82A81627C4B4B1004DA68E /* libgeode.dylib */,
 				AFB354B527ACB917006A4958 /* Resources */,
 				AFB354A127AC89D8006A4958 /* AppDelegate.h */,
 				AFB354A227AC89D8006A4958 /* AppDelegate.m */,
@@ -118,6 +125,7 @@
 				AF82A80A27BD2998004DA68E /* GeodeManageVC.m */,
 				AF82A80C27BFC8E5004DA68E /* GeodeVersionVC.h */,
 				AF82A80D27BFC8E5004DA68E /* GeodeVersionVC.m */,
+				AF82A81427C4ABF2004DA68E /* libgeode.h */,
 			);
 			path = GeodeAppMac;
 			sourceTree = "<group>";
@@ -358,6 +366,11 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/GeodeAppMac/Resources",
+					"$(PROJECT_DIR)/GeodeAppMac",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.geode.GeodeAppMac;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -385,6 +398,11 @@
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/GeodeAppMac/Resources",
+					"$(PROJECT_DIR)/GeodeAppMac",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.11;
 				PRODUCT_BUNDLE_IDENTIFIER = com.geode.GeodeAppMac;

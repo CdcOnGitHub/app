@@ -1050,13 +1050,13 @@ Gw
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                             </button>
-                            <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5ey-AL-RIA">
+                            <scrollView autohidesScrollers="YES" horizontalLineScroll="25" horizontalPageScroll="10" verticalLineScroll="25" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="5ey-AL-RIA">
                                 <rect key="frame" x="201" y="0.0" width="175" height="194"/>
                                 <clipView key="contentView" copiesOnScroll="NO" id="8Qc-OW-oQ3">
                                     <rect key="frame" x="1" y="1" width="173" height="192"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
-                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" viewBased="YES" id="XDG-6N-FOi">
+                                        <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="23" rowSizeStyle="automatic" viewBased="YES" id="XDG-6N-FOi">
                                             <rect key="frame" x="0.0" y="0.0" width="173" height="192"/>
                                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                             <size key="intercellSpacing" width="3" height="2"/>
@@ -1226,7 +1226,7 @@ Gw
                                 <color key="fillColor" name="quaternaryLabelColor" catalog="System" colorSpace="catalog"/>
                             </box>
                             <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="FO3-KN-LNT">
-                                <rect key="frame" x="257" y="318" width="84" height="28"/>
+                                <rect key="frame" x="257" y="318" width="86" height="28"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Context" id="l8G-SR-AUH">
                                     <font key="font" metaFont="system" size="24"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -1258,6 +1258,20 @@ Gw
                                     <constraint firstAttribute="height" constant="18" id="j9b-vu-moc"/>
                                 </constraints>
                             </progressIndicator>
+                            <button translatesAutoresizingMaskIntoConstraints="NO" id="hUo-EF-VDy">
+                                <rect key="frame" x="531" y="318" width="27" height="27"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="27" id="ZWu-gZ-da4"/>
+                                    <constraint firstAttribute="width" constant="27" id="kX4-vW-Du1"/>
+                                </constraints>
+                                <buttonCell key="cell" type="square" bezelStyle="shadowlessSquare" image="NSTouchBarDeleteTemplate" imagePosition="only" alignment="center" imageScaling="proportionallyUpOrDown" inset="2" id="PiF-OI-RX3">
+                                    <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                                    <font key="font" metaFont="system"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="promptDestroy:" target="a10-Vo-FpM" id="p2y-CH-L5L"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstItem="b1J-DJ-OGw" firstAttribute="top" secondItem="Qhc-Ca-TEV" secondAttribute="bottom" multiplier="1.1" constant="-20" id="04j-nc-Uwh"/>
@@ -1268,6 +1282,7 @@ Gw
                             <constraint firstItem="vaS-US-Ftz" firstAttribute="leading" secondItem="Qhc-Ca-TEV" secondAttribute="leading" id="6ij-hm-coW"/>
                             <constraint firstItem="KK5-WK-3CU" firstAttribute="bottom" secondItem="dtx-bx-gCB" secondAttribute="bottom" id="7Kn-42-Cef"/>
                             <constraint firstItem="AG7-mX-uXu" firstAttribute="centerY" secondItem="FO3-KN-LNT" secondAttribute="centerY" id="7mH-fV-vvK"/>
+                            <constraint firstAttribute="trailing" secondItem="hUo-EF-VDy" secondAttribute="trailing" constant="20" id="9mn-0a-zb1"/>
                             <constraint firstItem="5ey-AL-RIA" firstAttribute="trailing" secondItem="KK5-WK-3CU" secondAttribute="trailing" id="Ae4-lo-BvT"/>
                             <constraint firstItem="5ey-AL-RIA" firstAttribute="top" secondItem="rik-g4-ghy" secondAttribute="centerY" constant="20" id="DPO-2E-9rG"/>
                             <constraint firstItem="9JL-ln-AFL" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Wwb-FP-wSm" secondAttribute="leading" constant="384" id="DnG-dF-cto"/>
@@ -1300,6 +1315,7 @@ Gw
                             <constraint firstAttribute="trailing" secondItem="uHb-5E-79O" secondAttribute="trailing" multiplier="3" id="bQV-6G-sYr"/>
                             <constraint firstAttribute="trailing" secondItem="9JL-ln-AFL" secondAttribute="trailing" multiplier="1.5" id="bh4-pa-5MD" userLabel="wacky"/>
                             <constraint firstItem="9JL-ln-AFL" firstAttribute="leading" secondItem="5ey-AL-RIA" secondAttribute="trailing" constant="8" id="br8-SY-UBr"/>
+                            <constraint firstItem="hUo-EF-VDy" firstAttribute="top" secondItem="Wwb-FP-wSm" secondAttribute="top" constant="17" id="cJg-1k-Qmp"/>
                             <constraint firstItem="vaS-US-Ftz" firstAttribute="top" secondItem="0Cf-c1-ipK" secondAttribute="bottom" multiplier="1.3" constant="-4" id="cUu-7U-3a7"/>
                             <constraint firstItem="uHb-5E-79O" firstAttribute="top" secondItem="5a6-9k-LNF" secondAttribute="bottom" id="dc4-W9-GYx"/>
                             <constraint firstAttribute="bottom" secondItem="5ey-AL-RIA" secondAttribute="bottom" id="gb9-Nc-c49"/>
@@ -1567,6 +1583,7 @@ Gw
         <image name="NSGoBackTemplate" width="9" height="12"/>
         <image name="NSRemoveTemplate" width="11" height="11"/>
         <image name="NSTouchBarComposeTemplate" width="21" height="30"/>
+        <image name="NSTouchBarDeleteTemplate" width="15" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="pZJ-h6-pPx"/>

@@ -7,13 +7,14 @@
 //
 
 #import "GeodeBaseVC.h"
+#import "ContextStub.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface GeodeManageVC : GeodeBaseVC <NSTableViewDataSource, NSTableViewDelegate>
 @property (weak) IBOutlet NSTableView *logTable;
 @property (weak) IBOutlet NSOutlineView *modTable;
-@property (nonatomic, retain) NSString* geodePath;
+@property (atomic) ContextStub* ctx;
 
 - (void)openLog:(id)nid;
 @end

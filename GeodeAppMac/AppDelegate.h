@@ -20,6 +20,7 @@
 
 - (void)refreshContexts;
 - (ContextStub*)createContext;
+- (void)removeContext:(ContextStub*)c;
 @end
 
 #define NSAppDel ((AppDelegate*)[NSApp delegate])

@@ -8,6 +8,7 @@
 
 #import "GeodeInstallVC.h"
 #import "AppDelegate.h"
+#include "libgeode.h"
 
 @implementation GeodeInstallVC
 
@@ -80,11 +81,27 @@
     if (path == nil) return;
     
     ContextStub* c = [NSAppDel createContext];
-    c.installPath = path;
+    c.installPath = [path stringByAppendingPathComponent:@"Contents"];
     c.name = @"Geometry Dash";
     
-    NSLog(@"sex");
     
+    NSString* fmtPath = [c.installPath stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+    fmtPath = [fmtPath stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    fmtPath = [c.installPath stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
+    fmtPath = [fmtPath stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
+    
+    NSDictionary* error = [NSDictionary new];
+    NSString* script =  [NSString stringWithFormat:@"do shell script \"chmod -R 777 \\\"%@\\\"\"", fmtPath];
+    NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:script];
+    if (![appleScript executeAndReturnError:&error]) {
+        script = [NSString stringWithFormat:@"%@ with administrator privileges", script];
+        NSAppleScript *appleScript = [[NSAppleScript alloc] initWithSource:script];
+        if (![appleScript executeAndReturnError:&error]) {
+            NSLog(@"Could not get permissions...");
+            return;
+        }
+    }
+    geode_update(c.installPath.UTF8String, "latest");
     [NSAppDel refreshContexts];
     [[NSNotificationCenter defaultCenter] postNotificationName:@"ReloadContexts" object:self];
     [self dismissController:nil];
