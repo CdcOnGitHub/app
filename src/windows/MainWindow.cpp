@@ -91,7 +91,7 @@ MainWindow::~MainWindow() {
 MainWindow::MainWindow() : Window("Geode App v" GEODEAPP_VERSION, 800_px, 600_px) {
     auto layout = new SplitLayout();
     layout->hideSeparatorLine();
-
+    
     this->createTabs();
 
     m_page = new PadWidget(Tab::s_pad, nullptr);

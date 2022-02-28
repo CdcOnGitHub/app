@@ -334,7 +334,7 @@ void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
 
         return;
     }
-    if (!m_paintLine) return;
+    if (!m_paintLine || m_layout->m_collapsed) return;
     Graphics g(hdc);
     InitGraphics(g);
     auto r = this->rect();
