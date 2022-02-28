@@ -370,7 +370,7 @@ RectF TextWidget::measureText(
     StringFormat const& format
 ) {
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
     auto tf = format.Clone();
     tf->SetFormatFlags(StringFormatFlagsMeasureTrailingSpaces);
     RectF r;
@@ -422,7 +422,7 @@ void TextWidget::paintText(
     StringFormat const& format
 ) {
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     Font font(hdc, Manager::get()->loadFont(fontFamily, fontSize, style));
     SolidBrush brush(color);

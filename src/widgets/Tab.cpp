@@ -54,7 +54,7 @@ void TabSeparator::updateSize(HDC hdc, SIZE size) {
 
 void TabSeparator::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     auto r = this->rect();
     r.Y += r.Height / 2 - 1_px;
@@ -138,7 +138,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     ar.Width = s_height;
     
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     if (m_selected) {
         SolidBrush bgBrush(Style::selectedTab());
@@ -157,7 +157,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
 
     Graphics gt(hdc);
 
-    gt.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(gt);
     Region reg(tr);
     gt.SetClip(&reg);
     StringFormat f;

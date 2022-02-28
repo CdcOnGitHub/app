@@ -35,8 +35,8 @@ void MainWindow::createTab<"settings"_id>(VerticalLayout* page) {
     page->add(button);
 
     auto lightModeInfoBG = new RectWidget();
-    lightModeInfoBG->color(color::alpha(Style::warning(), 155));
-    lightModeInfoBG->cornerRadius(10);
+    lightModeInfoBG->color(color::alpha(Style::warning(), 55));
+    lightModeInfoBG->cornerRadius(Button::s_rounding);
     lightModeInfoBG->hide();
 
     auto lightModeInfoPad = new PadWidget(Tab::s_pad);

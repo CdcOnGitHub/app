@@ -1,6 +1,6 @@
 #include "Button.hpp"
 
-int Button::s_rounding = 2_px;
+int Button::s_rounding = 3_px;
 
 Button::Button(std::string const& text) {
     m_typeName = "Button";
@@ -50,7 +50,7 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto r = this->rect();
 
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     FillRoundRect(&g, r, 
         m_mousedown ?
@@ -59,7 +59,7 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
             color::lighten(m_bgColor, 50) :
             m_bgColor
         ),
-        s_rounding, s_rounding * 2
+        s_rounding / 2, s_rounding
     );
     
     StringFormat f;

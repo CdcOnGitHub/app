@@ -325,7 +325,7 @@ void ResizeGrip::mouseMove(int x, int y) {
 void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
     if (!m_paintLine) return;
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
     auto r = this->rect();
     SolidBrush brush(Style::separator());
     if (m_horizontal) {
