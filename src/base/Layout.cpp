@@ -304,6 +304,8 @@ void ResizeGrip::mouseUp(int x, int y) {
 
 void ResizeGrip::mouseDoubleClick(int x, int y) {
     m_layout->collapse();
+    this->releaseMouse();
+    this->update();
 }
 
 void ResizeGrip::mouseMove(int x, int y) {
@@ -323,6 +325,15 @@ void ResizeGrip::mouseMove(int x, int y) {
 }
 
 void ResizeGrip::paint(HDC hdc, PAINTSTRUCT* ps) {
+    if (m_layout->m_collapsed && m_hovered) {
+        Graphics g(hdc);
+        InitGraphics(g);
+
+        SolidBrush brush(Style::hover());
+        g.FillRectangle(&brush, toRectF(this->rect()));
+
+        return;
+    }
     if (!m_paintLine) return;
     Graphics g(hdc);
     InitGraphics(g);
@@ -417,6 +428,7 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
         seppos.x = asplit - ResizeGrip::s_size;
         seppos.y = 0;
         sepsize.cx = ResizeGrip::s_size * 2;
+        if (m_collapsed) sepsize.cx *= 2;
         sepsize.cy = size.cy;
     } else {
         fsize.cy = asplit;
@@ -427,6 +439,7 @@ void SplitLayout::updateSize(HDC hdc, SIZE size) {
         seppos.y =  asplit - ResizeGrip::s_size;
         sepsize.cx = size.cx;
         sepsize.cy = ResizeGrip::s_size * 2;
+        if (m_collapsed) sepsize.cy *= 2;
     }
     m_first->updateSize(hdc, fsize);
     m_second->updateSize(hdc, ssize);
