@@ -134,7 +134,7 @@ void Tab::paint(HDC hdc, PAINTSTRUCT* ps) {
     }
 
     auto ar = r;
-    ar.X = r.Width + s_arrow / 2;
+    ar.X = r.Width + s_pad / 2;
     ar.Width = s_height;
     
     Graphics g(hdc);
