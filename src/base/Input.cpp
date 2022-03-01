@@ -49,7 +49,7 @@ void Input::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto r = this->rect();
 
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     FillRoundRect(
         &g, r, Style::inputBG(),

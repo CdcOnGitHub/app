@@ -45,7 +45,7 @@ void RectWidget::paint(HDC hdc, PAINTSTRUCT* ps) {
     auto r = this->rect();
 
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     if (m_cornerRadius) {
         FillRoundRect(

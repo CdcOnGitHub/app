@@ -12,6 +12,8 @@ void GetRoundRectPath(GraphicsPath *pPath, Rect r, int dia);
 void DrawRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, int width);
 void FillRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, int width);
 
+void InitGraphics(Graphics& g);
+
 std::ostream& operator<<(std::ostream&, RECT);
 std::ostream& operator<<(std::ostream&, SIZE);
 std::ostream& operator<<(std::ostream&, POINT);

@@ -99,28 +99,12 @@ void FillRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, 
     // draw the round rect
     pGraphics->FillPath(&brush, &path);
 
-    // if width > 1
-    for (int i = 1; i < width; i++) {
-        // left stroke
-        r.Inflate(-1, 0);
-        // get the path
-        GetRoundRectPath(&path, r, dia);
-            
-        // draw the round rect
-        pGraphics->FillPath(&brush, &path);
-
-        // up stroke
-        r.Inflate(0, -1);
-
-        // get the path
-        GetRoundRectPath(&path, r, dia);
-            
-        // draw the round rect
-        pGraphics->FillPath(&brush, &path);
-    }
-
     // restore page unit
     pGraphics->SetPageUnit((Unit)oldPageUnit);
+}
+
+void InitGraphics(Graphics& g) {
+    g.SetSmoothingMode(SmoothingModeAntiAlias);
 }
 
 std::ostream& operator<<(std::ostream& stream, RECT rect) {

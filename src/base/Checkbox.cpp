@@ -71,7 +71,7 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     r.Width -= m_fontSize - 5_px;
 
     Graphics g(hdc);
-    g.SetSmoothingMode(SmoothingModeAntiAlias);
+    InitGraphics(g);
 
     auto color = m_checked ? Style::primary() : Style::dark();
     FillRoundRect(&g, cr, 
@@ -81,7 +81,7 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
             color::lighten(color, 50) :
             color
         ),
-        Button::s_rounding, Button::s_rounding * 2
+        Button::s_rounding / 2, Button::s_rounding
     );
 
     if (m_checked) {
