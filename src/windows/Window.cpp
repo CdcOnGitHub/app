@@ -150,6 +150,28 @@ void Window::move(int x, int y) {
     SetWindowPos(m_hwnd, nullptr, x, y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 }
 
+UINT Window::timer(int time, std::function<void()> proc, bool repeat) {
+    auto id = 1u;
+    while (m_timerIDs.count(id)) id++;
+    m_timerIDs.insert({ id, { proc, time, repeat } });
+    SetTimer(m_hwnd, id, time, nullptr);
+    return id;
+}
+
+void Window::releaseTimer(UINT id) {
+    if (m_timerIDs.count(id)) {
+        KillTimer(m_hwnd, id);
+        m_timerIDs.erase(id);
+    }
+}
+
+void Window::resetTimer(UINT id) {
+    if (m_timerIDs.count(id)) {
+        KillTimer(m_hwnd, id);
+        SetTimer(m_hwnd, id, m_timerIDs.at(id).m_time, nullptr);
+    }
+}
+
 HWND Window::getHWND() const {
     return m_hwnd;
 }
@@ -423,6 +445,26 @@ LRESULT Window::proc(UINT msg, WPARAM wp, LPARAM lp) {
             m_fullscreen = wp == SIZE_MAXIMIZED;
             m_width = LOWORD(lp);
             m_height = HIWORD(lp);
+        } break;
+
+        case WM_SETFOCUS: {
+            this->propagateFocusEvent(true);
+        } break;
+
+        case WM_KILLFOCUS: {
+            this->propagateFocusEvent(false);
+        } break;
+
+        case WM_TIMER: {
+            auto id = static_cast<UINT>(wp);
+            if (m_timerIDs.count(id)) {
+                auto timer = m_timerIDs.at(id);
+                timer.m_func();
+                if (!timer.m_repeat) {
+                    KillTimer(m_hwnd, id);
+                    m_timerIDs.erase(id);
+                }
+            }
         } break;
     }
     return DefWindowProc(m_hwnd, msg, wp, lp);

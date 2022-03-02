@@ -6,6 +6,8 @@ class Button : public TextWidget {
 public:
     using Callback = std::function<void(Button*)>;
     static int s_rounding;
+    static int s_topPad;
+    static int s_sidePad;
 
 protected:
     Color m_bgColor;

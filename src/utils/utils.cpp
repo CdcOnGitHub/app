@@ -42,65 +42,31 @@ void GetRoundRectPath(GraphicsPath *pPath, Rect r, int dia) {
 void DrawRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, int width) {
     int dia = 2*radius;
 
-    // set to pixel mode
     int oldPageUnit = pGraphics->SetPageUnit(UnitPixel);
 
-    // define the pen
     Pen pen(color, 1);    
     pen.SetAlignment(PenAlignmentCenter);
 
-    // get the corner path
     GraphicsPath path;
-
-    // get path
     GetRoundRectPath(&path, r, dia);
 
-    // draw the round rect
     pGraphics->DrawPath(&pen, &path);
+    pGraphics->SetPageUnit((Unit)oldPageUnit);
+}
 
-    // if width > 1
-    for (int i = 1; i < width; i++) {
-        // left stroke
-        r.Inflate(-1, 0);
-        // get the path
-        GetRoundRectPath(&path, r, dia);
-            
-        // draw the round rect
-        pGraphics->DrawPath(&pen, &path);
+void FillRoundRect(Graphics* pGraphics, Rect r, Brush const& brush, int radius, int width) {
+    int dia = 2 * radius;
+    int oldPageUnit = pGraphics->SetPageUnit(UnitPixel);
 
-        // up stroke
-        r.Inflate(0, -1);
+    GraphicsPath path;
+    GetRoundRectPath(&path, r, dia);
+    pGraphics->FillPath(&brush, &path);
 
-        // get the path
-        GetRoundRectPath(&path, r, dia);
-            
-        // draw the round rect
-        pGraphics->DrawPath(&pen, &path);
-    }
-
-    // restore page unit
     pGraphics->SetPageUnit((Unit)oldPageUnit);
 }
 
 void FillRoundRect(Graphics* pGraphics, Rect r, Color const& color, int radius, int width) {
-    int dia = 2*radius;
-
-    // set to pixel mode
-    int oldPageUnit = pGraphics->SetPageUnit(UnitPixel);
-
-    SolidBrush brush(color);
-
-    // get the corner path
-    GraphicsPath path;
-
-    // get path
-    GetRoundRectPath(&path, r, dia);
-
-    // draw the round rect
-    pGraphics->FillPath(&brush, &path);
-
-    // restore page unit
-    pGraphics->SetPageUnit((Unit)oldPageUnit);
+    return FillRoundRect(pGraphics, r, SolidBrush(color), radius, width);
 }
 
 void InitGraphics(Graphics& g) {
@@ -124,6 +90,14 @@ std::ostream& operator<<(std::ostream& stream, SIZE p) {
 }
 
 std::ostream& operator<<(std::ostream& stream, Rect p) {
+    return stream << p.X << ", " << p.Y << ", " << p.Width << ", " << p.Height;
+}
+
+std::ostream& operator<<(std::ostream& stream, RectF p) {
+    return stream << p.X << ", " << p.Y << ", " << p.Width << ", " << p.Height;
+}
+
+std::wostream& operator<<(std::wostream& stream, RectF p) {
     return stream << p.X << ", " << p.Y << ", " << p.Width << ", " << p.Height;
 }
 
@@ -180,16 +154,22 @@ PointF toPointF(Rect const& p) {
     };
 }
 
-Color color::darken(Color const& color, BYTE darken) {
+BYTE clampByte(int color) {
+    if (color < 0) return 0;
+    if (color > 255) return 255;
+    return static_cast<BYTE>(color);
+}
+
+Color color::darken(Color const& color, int darken) {
     return {
         color.GetA(),
-        static_cast<BYTE>(color.GetR() - darken),
-        static_cast<BYTE>(color.GetG() - darken),
-        static_cast<BYTE>(color.GetB() - darken)
+        clampByte(color.GetR() - darken),
+        clampByte(color.GetG() - darken),
+        clampByte(color.GetB() - darken)
     };
 }
 
-Color color::lighten(Color const& color, BYTE lighten) {
+Color color::lighten(Color const& color, int lighten) {
     return darken(color, -lighten);
 }
 

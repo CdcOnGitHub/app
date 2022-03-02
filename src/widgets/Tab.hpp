@@ -67,12 +67,21 @@ public:
     void click() override;
 };
 
-class TabSeparator : public Widget {
+class Separator : public Widget {
+protected:
+    bool m_pad;
+    int m_size;
+    int m_drawSize;
+
 public:
-    TabSeparator();
+    Separator(bool pad = true, int size = 20_px, int drawSize = 2_px);
 
     void updateSize(HDC hdc, SIZE) override;
     void paint(HDC hdc, PAINTSTRUCT* ps) override;
+
+    void pad(bool = true);
+    void size(int);
+    void drawSize(int);
 };
 
 constexpr size_t operator"" _id(const char* str, size_t) {

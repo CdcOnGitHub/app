@@ -40,6 +40,7 @@ protected:
     Widget* propagateMouseEvent(Point& p, bool down, int clickCount);
     bool propagateTabEvent(int& index, int target);
     bool propagateCaptureMouse(Point& p);
+    void propagateFocusEvent(bool focused);
     void captureMouse();
     void releaseMouse();
     void captureKeyboard();
@@ -77,6 +78,8 @@ public:
     virtual bool wantsMouse() const;
     virtual void keyDown(size_t key, size_t scanCode);
     virtual void keyUp(size_t key, size_t scanCode);
+    virtual void windowFocused(bool focus);
+    virtual void keyboardCaptured(bool captured);
     virtual const char* type() const;
     void name(std::string const& name);
     std::string const& name();
@@ -110,7 +113,7 @@ class TextWidget : public ColorWidget {
 protected:
     std::wstring m_text;
     std::wstring m_font;
-    int m_fontSize = 20_px;
+    int m_fontSize = 18_px;
     bool m_wordWrap = true;
     int m_style = 0;
 
@@ -167,7 +170,7 @@ public:
     void font(std::wstring const& font);
     virtual void font(std::string const& font, int size);
     virtual void font(std::wstring const& font, int size);
-    virtual void fontSize(int size = 20_px);
+    virtual void fontSize(int size = 18_px);
     void wrap(bool);
     void style(int style);
 };

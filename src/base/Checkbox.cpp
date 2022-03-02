@@ -5,7 +5,7 @@ Checkbox::Checkbox(std::string const& text, bool checked) {
     m_typeName = "Checkbox";
     this->check(checked);
     this->text(text);
-    this->font("Segoe UI");
+    this->font(Style::font());
     this->color(Style::text());
     this->autoResize();
     this->show();
@@ -73,13 +73,19 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
     InitGraphics(g);
 
-    auto color = m_checked ? Style::primary() : Style::dark();
-    FillRoundRect(&g, cr, 
+    auto color = m_checked ? Style::button() : Style::button();
+    auto c1 = 
         m_mousedown ?
-            color::darken(color, 50) :
+            color::lighten(color, Style::buttonPress()) :
         (m_hovered ?
             color::lighten(color, 50) :
-            color
+            color);
+    auto c2 = color::darken(c1, Style::buttonGradient());
+    
+    FillRoundRect(&
+        g, cr, 
+        LinearGradientBrush(
+            Point { 0, r.Y }, Point { 0, r.Y + r.Height }, c1, c2
         ),
         Button::s_rounding / 2, Button::s_rounding
     );
@@ -91,7 +97,7 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
         auto wt = w / t;
         auto wh = (t - 1) * wt;
         auto d = (cr.Height - wh) / 2;
-        Pen pen(Style::text(), m_fontSize / 7.f);
+        Pen pen(Style::text(), 1.0_pxf);
         GraphicsPath path;
         path.AddLine(
             cr.X + p, cr.Y + d + (t - 2) * wt,
@@ -102,6 +108,14 @@ void Checkbox::paint(HDC hdc, PAINTSTRUCT* ps) {
             cr.X + p + w, cr.Y + d
         );
         g.DrawPath(&pen, &path);
+    }
+
+    if (Style::useBorders()) {
+        DrawRoundRect(
+            &g, cr,
+            color::lighten(c1, Style::buttonBorder()),
+            Button::s_rounding / 2, Button::s_rounding
+        );
     }
 
     StringFormat f;

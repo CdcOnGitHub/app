@@ -35,6 +35,7 @@ void Widget::captureKeyboard() {
     }
     m_keyboardFocused = true;
     s_keyboardWidget = this;
+    this->keyboardCaptured(true);
     this->update();
 }
 
@@ -42,6 +43,7 @@ void Widget::releaseKeyboard() {
     if (s_keyboardWidget == this) {
         m_keyboardFocused = false;
         s_keyboardWidget = nullptr;
+        this->keyboardCaptured(false);
     }
     this->update();
 }
@@ -155,6 +157,9 @@ void Widget::mouseUp(int x, int y) {
 void Widget::keyDown(size_t key, size_t scanCode) {}
 void Widget::keyUp(size_t key, size_t scanCode) {}
 
+void Widget::windowFocused(bool) {}
+void Widget::keyboardCaptured(bool) {}
+
 void Widget::tabEnter() {
     this->m_tabbed = true;
     this->update();
@@ -246,6 +251,13 @@ Widget* Widget::propagateMouseEvent(Point& p, bool down, int clickCount) {
         if (r) ret = r;
     }
     return ret;
+}
+
+void Widget::propagateFocusEvent(bool focused) {
+    for (auto child : m_children) {
+        child->windowFocused(focused);
+        child->propagateFocusEvent(focused);
+    }
 }
 
 void Widget::name(std::string const& name) {

@@ -90,8 +90,8 @@ int PadWidget::pad() const {
 
 void PadWidget::updateSize(HDC hdc, SIZE available) {
     if (!m_widget) return;
-    available.cx -= m_pad * 2;
-    available.cy -= m_pad * 2;
+    available.cx -= m_pad;
+    available.cy -= m_pad;
     Widget::updateSize(hdc, available);
     auto size = m_widget->size();
     this->resize(size.Width + m_pad * 2, size.Height + m_pad * 2);
@@ -131,6 +131,11 @@ void HorizontalLayout::fill(bool on) {
     this->update();
 }
 
+void HorizontalLayout::invert(bool on) {
+    m_inverted = on;
+    this->update();
+}
+
 void HorizontalLayout::align(Align defaultAlign) {
     m_defaultAlign = defaultAlign;
     this->update();
@@ -161,7 +166,8 @@ void HorizontalLayout::updateSize(HDC hdc, SIZE available) {
         m_height = m_fill ? available.cy : height;
     }
     int pos = 0;
-    for (auto& child : m_children) {
+    auto arr = m_inverted ? reverse(m_children) : m_children;
+    for (auto& child : arr) {
         if (!child->visible()) continue;
         auto ypos = 0;
         auto alignment = m_defaultAlign;
@@ -207,6 +213,11 @@ void VerticalLayout::fill(bool on) {
     this->update();
 }
 
+void VerticalLayout::invert(bool on) {
+    m_inverted = on;
+    this->update();
+}
+
 void VerticalLayout::align(Align defaultAlign) {
     m_defaultAlign = defaultAlign;
     this->update();
@@ -237,7 +248,8 @@ void VerticalLayout::updateSize(HDC hdc, SIZE available) {
         m_height = availableHeight;
     }
     int pos = 0;
-    for (auto& child : m_children) {
+    auto arr = m_inverted ? reverse(m_children) : m_children;
+    for (auto& child : arr) {
         if (!child->visible()) continue;
         auto xpos = 0;
         auto alignment = m_defaultAlign;

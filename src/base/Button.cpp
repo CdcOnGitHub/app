@@ -1,19 +1,23 @@
 #include "Button.hpp"
 
-int Button::s_rounding = 3_px;
+int Button::s_rounding = 4_px;
+int Button::s_topPad   = 4_px;
+int Button::s_sidePad  = 20_px;
 
 Button::Button(std::string const& text) {
     m_typeName = "Button";
     this->text(text);
-    this->font("Segoe UI");
+    this->font(Style::font());
     this->color(Style::text());
-    this->bg(Color(120, 120, 120));
+    this->bg(Style::button());
     this->autoResize();
     this->show();
 }
 
 void Button::click() {
-    m_callback(this);
+    if (m_callback) {
+        m_callback(this);
+    }
 }
 
 void Button::callback(Callback cb) {
@@ -40,7 +44,7 @@ HCURSOR Button::cursor() const {
 void Button::updateSize(HDC hdc, SIZE available) {
     if (m_autoresize) {
         auto r = this->measureText(hdc, available);
-        this->resize(static_cast<int>(r.Width) + 30_px, static_cast<int>(r.Height) + 10_px);
+        this->resize(static_cast<int>(r.Width) + s_sidePad * 2, static_cast<int>(r.Height) + s_topPad * 2);
         m_autoresize = true;
     }
     Widget::updateSize(hdc, available);
@@ -52,12 +56,18 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
     InitGraphics(g);
 
-    FillRoundRect(&g, r, 
-        m_mousedown ?
-            color::darken(m_bgColor, 50) :
+    auto c1 = m_mousedown ?
+            color::lighten(m_bgColor, Style::buttonPress()) :
         (m_hovered ?
             color::lighten(m_bgColor, 50) :
             m_bgColor
+        );
+    auto c2 = color::darken(c1, Style::buttonGradient());
+
+    FillRoundRect(
+        &g, r,
+        LinearGradientBrush(
+            Point { 0, r.Y }, Point { 0, r.Y + r.Height }, c1, c2
         ),
         s_rounding / 2, s_rounding
     );
@@ -67,6 +77,14 @@ void Button::paint(HDC hdc, PAINTSTRUCT* ps) {
     f.SetLineAlignment(StringAlignmentCenter);
     f.SetTrimming(StringTrimmingNone);
     this->paintText(hdc, r, f);
+
+    if (Style::useBorders()) {
+        DrawRoundRect(
+            &g, r,
+            color::lighten(c1, Style::buttonBorder()),
+            s_rounding / 2, s_rounding
+        );
+    }
 
     Widget::paint(hdc, ps);
 }

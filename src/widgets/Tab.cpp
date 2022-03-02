@@ -39,31 +39,51 @@ void Tabs::select(Tab* tab) {
     }
 }
 
-TabSeparator::TabSeparator() {
+Separator::Separator(bool p, int size, int drawSize) {
+    this->drawSize(drawSize);
+    this->size(size);
+    this->pad(p);
     this->autoResize();
     this->show();
 }
 
-void TabSeparator::updateSize(HDC hdc, SIZE size) {
+void Separator::updateSize(HDC hdc, SIZE size) {
     Widget::updateSize(hdc, size);
     if (m_autoresize) {
-        this->resize(size.cx, 20_px);
+        this->resize(size.cx, m_size);
         m_autoresize = true;
     }
 }
 
-void TabSeparator::paint(HDC hdc, PAINTSTRUCT* ps) {
+void Separator::paint(HDC hdc, PAINTSTRUCT* ps) {
     Graphics g(hdc);
     InitGraphics(g);
 
     auto r = this->rect();
-    r.Y += r.Height / 2 - 1_px;
-    r.Height = 2_px;
-    r.X += Tab::s_pad;
-    r.Width -= 2 * Tab::s_pad;
-    g.FillRectangle(&SolidBrush(Style::separator()), toRectF(r));
+    r.Y += r.Height / 2 - m_drawSize / 2;
+    r.Height = m_drawSize;
+    r.X += (m_pad ? Tab::s_pad : 0);
+    r.Width -= 2 * (m_pad ? Tab::s_pad : 0);
+    auto rf = toRectF(r);
+    if (rf.Height == 1) rf.Height /= 2;
+    g.FillRectangle(&SolidBrush(Style::separator()), rf);
 
     Widget::paint(hdc, ps);
+}
+
+void Separator::pad(bool p) {
+    m_pad = p;
+    this->update();
+}
+
+void Separator::size(int s) {
+    m_size = s;
+    this->update();
+}
+
+void Separator::drawSize(int s) {
+    m_drawSize = s;
+    this->update();
 }
 
 Tab::Tab(size_t id, std::string const& text, Tab::Type type) : m_id(id) {

@@ -32,7 +32,7 @@ TestWindow::TestWindow() : Window("Test Window") {
     
     auto btn = new Button("Acquire Estrogen");
     btn->move(80_px, 100_px);
-    btn->font("Segoe UI", 18_px);
+    btn->font(Style::font(), 18_px);
     btn->bg({ 111, 125, 170 });
     btn->callback([](auto b) -> void { std::wcout << L"hello from " << b->text() << L"\n"; });
     this->add(btn);

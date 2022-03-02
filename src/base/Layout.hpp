@@ -59,6 +59,7 @@ public:
 
 protected:
     bool m_fill = false;
+    bool m_inverted = false;
     Align m_defaultAlign = Align::Start;
     std::unordered_map<Widget*, Align> m_alignments;
 
@@ -66,6 +67,7 @@ public:
     HorizontalLayout();
 
     void fill(bool on = true);
+    void invert(bool on = true);
     void align(Align defaultAlign);
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
@@ -83,6 +85,7 @@ public:
 
 protected:
     bool m_fill = false;
+    bool m_inverted = false;
     Align m_defaultAlign = Align::Start;
     std::unordered_map<Widget*, Align> m_alignments;
 
@@ -90,6 +93,7 @@ public:
     VerticalLayout();
 
     void fill(bool on = true);
+    void invert(bool on = true);
     void align(Align defaultAlign);
     void updateSize(HDC, SIZE) override;
     void add(Widget* child) override;
