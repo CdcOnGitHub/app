@@ -3,8 +3,8 @@
 #include <Button.hpp>
 #include <RectWidget.hpp>
 
-TestWindow::TestWindow() : Window("Test Window") {
-    auto label = new Label("Hello World longer text and stuff yeahh");
+TestWindow::TestWindow() : Window("Hello from github workflows") {
+    auto label = new Label("Epic app");
     label->move(40_px, 40_px);
     label->font("Comic Sans MS");
     this->add(label);
